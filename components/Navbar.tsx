@@ -30,8 +30,8 @@ export function Navbar() {
             <Link href="/integrations" className="text-gray-700 hover:text-primary-600 transition-colors">
               Integraciones
             </Link>
-            <Link href="/api-docs" className="text-gray-700 hover:text-primary-600 transition-colors">
-              API
+            <Link href="/developers" className="text-gray-700 hover:text-primary-600 transition-colors">
+              👨‍💻 Developers
             </Link>
             <Link href="/test-api" className="text-gray-700 hover:text-primary-600 transition-colors">
               🧪 Test API
@@ -75,8 +75,8 @@ export function Navbar() {
               <Link href="/integrations" className="text-gray-700 hover:text-primary-600">
                 Integraciones
               </Link>
-              <Link href="/api-docs" className="text-gray-700 hover:text-primary-600">
-                API
+              <Link href="/developers" className="text-gray-700 hover:text-primary-600">
+                👨‍💻 Developers
               </Link>
               <Link href="/test-api" className="text-gray-700 hover:text-primary-600">
                 🧪 Test API

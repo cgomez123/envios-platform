@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipMaster Pro - Guía de Instalación Shopify</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #3b82f6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        h1 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6b7280;
+            font-size: 18px;
+        }
+        .step {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .step h3 {
+            color: #1f2937;
+            margin-top: 0;
+        }
+        .code {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 15px;
+            border-radius: 8px;
+            color: #b91c1c;
+            margin: 15px 0;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 15px;
+            border-radius: 8px;
+            color: #166534;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">S</div>
+            <h1>ShipMaster Pro</h1>
+            <p class="subtitle">Guía de Instalación para Shopify</p>
+        </div>
+
+        <div class="step">
+            <h3>📋 Paso 1: Obtener API Key</h3>
+            <p>Primero necesitas tu API key de ShipMaster Pro:</p>
+            <ol>
+                <li>Ve a tu <a href="http://localhost:3000/dashboard" target="_blank">Dashboard de ShipMaster</a></li>
+                <li>Navega a <strong>"Configuración"</strong> → <strong>"API Keys"</strong></li>
+                <li>Crea una nueva API key para Shopify</li>
+                <li>Copia la API key (formato: <code>sk_live_...</code>)</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Paso 2: Instalar en Shopify</h3>
+            <p>En tu admin de Shopify:</p>
+            <ol>
+                <li>Ve a <strong>"Online Store"</strong> → <strong>"Themes"</strong></li>
+                <li>Haz clic en <strong>"Actions"</strong> → <strong>"Edit Code"</strong></li>
+                <li>En la carpeta <strong>"Assets"</strong>, crea un nuevo archivo llamado <span class="highlight">shipmaster.js</span></li>
+                <li>Copia todo el contenido de este archivo:</li>
+            </ol>
+            
+            <div class="code" id="plugin-code">
+                // Se cargará automáticamente...
+            </div>
+            
+            <button onclick="copyCode()" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 10px;">
+                📋 Copiar Código
+            </button>
+        </div>
+
+        <div class="step">
+            <h3>⚙️ Paso 3: Configurar en Theme</h3>
+            <p>En tu archivo <strong>theme.liquid</strong> (o <strong>cart.liquid</strong>):</p>
+            
+            <div class="code">
+&lt;!-- Agregar antes del &lt;/head&gt; --&gt;
+&lt;meta name="shipmaster-api-key" content="<span class="highlight">TU_API_KEY_AQUI</span>"&gt;
+&lt;meta name="shipmaster-debug" content="true"&gt;
+
+&lt;!-- Agregar antes del &lt;/body&gt; --&gt;
+{{ 'shipmaster.js' | asset_url | script_tag }}
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Paso 4: Personalización (Opcional)</h3>
+            <p>Para personalizar completamente:</p>
+            
+            <div class="code">
+&lt;script&gt;
+// Inicializar manualmente con opciones
+const shipmaster = new ShipMasterShopify('tu_api_key', {
+    debug: true,
+    autoShow: true,
+    baseUrl: 'https://tu-dominio.com'
+});
+
+// Integración con checkout personalizado
+document.addEventListener('checkout:updated', async (event) => {
+    const orderData = event.detail;
+    const shipment = await shipmaster.createShipment(orderData);
+    console.log('Envío creado:', shipment);
+});
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="success">
+            <strong>🎉 ¡Listo!</strong><br>
+            Tu tienda Shopify ahora mostrará opciones de envío automáticamente en el carrito.
+            Los clientes verán cotizaciones reales de múltiples paqueterías.
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Importante:</strong><br>
+            Reemplaza <code>TU_API_KEY_AQUI</code> con tu API key real de ShipMaster Pro.
+            Mantén tu API key segura y nunca la compartas públicamente.
+        </div>
+    </div>
+
+    <script>
+        // Cargar el código del plugin automáticamente
+        fetch('shipmaster-plugin.js')
+            .then(response => response.text())
+            .then(code => {
+                document.getElementById('plugin-code').textContent = code;
+            })
+            .catch(() => {
+                document.getElementById('plugin-code').textContent = '// Error cargando el código. Descarga el archivo manualmente.';
+            });
+        
+        function copyCode() {
+            const code = document.getElementById('plugin-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('📋 Código copiado al portapapeles');
+            });
+        }
+    </script>
+</body>
+</html>
