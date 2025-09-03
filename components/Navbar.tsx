@@ -36,6 +36,9 @@ export function Navbar() {
             <Link href="/test-api" className="text-gray-700 hover:text-primary-600 transition-colors">
               🧪 Test API
             </Link>
+            <Link href="/debug-api" className="text-gray-700 hover:text-primary-600 transition-colors">
+              🔧 Debug
+            </Link>
             <Link href="/login" className="text-primary-600 hover:text-primary-700 font-medium">
               Iniciar Sesión
             </Link>
@@ -77,6 +80,9 @@ export function Navbar() {
               </Link>
               <Link href="/test-api" className="text-gray-700 hover:text-primary-600">
                 🧪 Test API
+              </Link>
+              <Link href="/debug-api" className="text-gray-700 hover:text-primary-600">
+                🔧 Debug
               </Link>
               <Link href="/login" className="text-primary-600 font-medium">
                 Iniciar Sesión

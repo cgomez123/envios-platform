@@ -24,24 +24,25 @@ export async function GET() {
 
     // Test básico de conexión - SOLO cotización (NO genera cargos)
     const testRequest = {
-      origin: {
-        postal_code: "01000",
+      from_address: {
+        zipcode: "01000",
         city: "Ciudad de México",
         state: "CDMX", 
         country: "MX"
       },
-      destination: {
-        postal_code: "44100",
+      to_address: {
+        zipcode: "44100", 
         city: "Guadalajara",
         state: "JAL",
         country: "MX"
       },
-      package: {
+      parcel: {
         weight: 1.0,
         length: 20,
         width: 15,
         height: 10
-      }
+      },
+      packing_mode: "package" // Probando con "package" en lugar de "box"
     }
 
     const response = await fetch(`${apiUrl}/shipments/rates`, {

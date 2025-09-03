@@ -1,23 +1,24 @@
 // Integración con API de Mienvío
 interface MienvioQuoteRequest {
-  origin: {
-    postal_code: string;
+  from_address: {
+    zipcode: string;
     city: string;
     state: string;
     country: string;
   };
-  destination: {
-    postal_code: string;
+  to_address: {
+    zipcode: string;
     city: string;
     state: string;
     country: string;
   };
-  package: {
+  parcel: {
     weight: number; // en kg
     length: number; // en cm
     width: number;  // en cm
     height: number; // en cm
   };
+  packing_mode: string;
 }
 
 interface MienvioQuoteResponse {
@@ -75,10 +76,10 @@ export class MienvioAPI {
       console.log('🔑 Usando API REAL de Mienvío - Solo cotización (sin cargos)');
 
       const requestBody = {
-        origin: request.origin,
-        destination: request.destination,
-        package: request.package,
-        delivery_type: 'standard'
+        from_address: request.from_address,
+        to_address: request.to_address,
+        parcel: request.parcel,
+        packing_mode: request.packing_mode || 'package'
       };
 
       console.log('📤 Request a Mienvío:', JSON.stringify(requestBody, null, 2));
@@ -128,8 +129,8 @@ export class MienvioAPI {
 
   private async getDemoQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {
     // Simulación realista basada en peso y distancia
-    const baseWeight = request.package.weight || 1;
-    const isInternational = request.destination.country !== 'MX';
+    const baseWeight = request.parcel.weight || 1;
+    const isInternational = request.to_address.country !== 'MX';
     
     await new Promise(resolve => setTimeout(resolve, 1200)); // Simular delay de API real
 

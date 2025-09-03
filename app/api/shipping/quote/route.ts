@@ -14,27 +14,28 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Parsear direcciones (formato simple por ahora)
+    // Parsear direcciones usando el formato correcto de Mienvío
     const parseAddress = (address: string) => {
       const parts = address.split(',').map(p => p.trim())
       return {
         city: parts[0] || address,
         state: parts[1] || 'CDMX',
-        postal_code: '01000', // Por ahora usamos un CP genérico
+        zipcode: '01000', // Por ahora usamos un CP genérico
         country: 'MX'
       }
     }
 
-    // Preparar request para Mienvío
+    // Preparar request para Mienvío con formato correcto
     const mienvioRequest = {
-      origin: parseAddress(from),
-      destination: parseAddress(to),
-      package: {
+      from_address: parseAddress(from),
+      to_address: parseAddress(to),
+      parcel: {
         weight: parseFloat(weight) || 1,
         length: parseFloat(dimensions?.length) || 20,
         width: parseFloat(dimensions?.width) || 15,
         height: parseFloat(dimensions?.height) || 10,
-      }
+      },
+      packing_mode: 'package'
     }
 
     // Llamar a API de Mienvío
