@@ -165,24 +165,26 @@ export default function AdvancedDashboard() {
 
         {/* KPIs principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow border">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-500">Envíos Activos</div>
+                <div className="text-sm font-medium text-gray-500 mb-2">Envíos Activos</div>
                 <div className="text-3xl font-bold text-gray-900">{realTimeData.activeShipments}</div>
                 <div className="flex items-center mt-2">
                   <ArrowTrendingUpIcon className="h-4 w-4 text-green-500" />
                   <span className="text-sm text-green-600 ml-1">+12% vs ayer</span>
                 </div>
               </div>
-              <TruckIcon className="h-12 w-12 text-blue-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <TruckIcon className="h-6 w-6 text-blue-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow border">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-500">Ingresos Hoy</div>
+                <div className="text-sm font-medium text-gray-500 mb-2">Ingresos Hoy</div>
                 <div className="text-3xl font-bold text-gray-900">
                   ${realTimeData.todayRevenue.toLocaleString()}
                 </div>
@@ -191,72 +193,78 @@ export default function AdvancedDashboard() {
                   <span className="text-sm text-green-600 ml-1">+18% vs ayer</span>
                 </div>
               </div>
-              <CurrencyDollarIcon className="h-12 w-12 text-green-600" />
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow border">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-500">Tiempo Promedio</div>
+                <div className="text-sm font-medium text-gray-500 mb-2">Tiempo Promedio</div>
                 <div className="text-3xl font-bold text-gray-900">{realTimeData.avgDeliveryTime} días</div>
                 <div className="flex items-center mt-2">
                   <ArrowTrendingDownIcon className="h-4 w-4 text-green-500" />
                   <span className="text-sm text-green-600 ml-1">-5% mejor</span>
                 </div>
               </div>
-              <ClockIcon className="h-12 w-12 text-yellow-600" />
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <ClockIcon className="h-6 w-6 text-yellow-600" />
+              </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow border">
+          <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-medium text-gray-500">Satisfacción</div>
+                <div className="text-sm font-medium text-gray-500 mb-2">Satisfacción</div>
                 <div className="text-3xl font-bold text-gray-900">{realTimeData.customerSatisfaction}/5</div>
                 <div className="flex items-center mt-2">
                   <span className="text-sm text-green-600">⭐⭐⭐⭐⭐</span>
                 </div>
               </div>
-              <UsersIcon className="h-12 w-12 text-purple-600" />
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <UsersIcon className="h-6 w-6 text-purple-600" />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Métricas en tiempo real */}
-        <div className="bg-white rounded-lg shadow border p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-gray-900">🔴 En Tiempo Real</h2>
+            <h2 className="text-xl font-bold text-gray-900">🔴 Métricas en Tiempo Real</h2>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-sm text-gray-600">Actualizando cada 3 segundos</span>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-100">
+              <div className="text-2xl font-bold text-blue-600 mb-1">
                 {realTimeData.liveMetrics.shipmentsLastHour}
               </div>
-              <div className="text-sm text-gray-600">Envíos última hora</div>
+              <div className="text-sm text-blue-700">Envíos última hora</div>
             </div>
             
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">
+            <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
+              <div className="text-2xl font-bold text-green-600 mb-1">
                 {realTimeData.liveMetrics.currentOnlineUsers}
               </div>
-              <div className="text-sm text-gray-600">Usuarios online</div>
+              <div className="text-sm text-green-700">Usuarios online</div>
             </div>
             
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-600">
+            <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-100">
+              <div className="text-2xl font-bold text-purple-600 mb-1">
                 {realTimeData.liveMetrics.apiLatency}ms
               </div>
-              <div className="text-sm text-gray-600">Latencia API</div>
+              <div className="text-sm text-purple-700">Latencia API</div>
             </div>
             
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-center space-x-2">
+            <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-100">
+              <div className="flex items-center justify-center space-x-2 mb-1">
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                 <span className="font-semibold text-green-600">Operational</span>
               </div>
@@ -265,9 +273,9 @@ export default function AdvancedDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* Performance por región */}
-          <div className="bg-white rounded-lg shadow border p-6">
+          <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">🌎 Performance por Región</h2>
             
             <div className="space-y-4">
@@ -321,7 +329,7 @@ export default function AdvancedDashboard() {
           </div>
 
           {/* Top clientes */}
-          <div className="bg-white rounded-lg shadow border p-6">
+          <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-6">👑 Top Clientes</h2>
             
             <div className="space-y-4">
@@ -361,7 +369,7 @@ export default function AdvancedDashboard() {
         </div>
 
         {/* Gráficos avanzados */}
-        <div className="bg-white rounded-lg shadow border p-6 mt-8">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">📈 Análisis de Tendencias</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -415,7 +423,7 @@ export default function AdvancedDashboard() {
         </div>
 
         {/* Acciones rápidas avanzadas */}
-        <div className="bg-white rounded-lg shadow border p-6 mt-8">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-6 mt-8">
           <h2 className="text-xl font-bold text-gray-900 mb-6">⚡ Acciones Avanzadas</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
