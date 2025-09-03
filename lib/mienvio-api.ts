@@ -128,17 +128,28 @@ export class MienvioAPI {
   }
 
   private async getDemoQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {
-    // Simulación realista basada en peso y distancia
+    // Simulación SÚPER realista basada en peso, distancia y ubicación
     const baseWeight = request.parcel.weight || 1;
     const isInternational = request.to_address.country !== 'MX';
     
-    await new Promise(resolve => setTimeout(resolve, 1200)); // Simular delay de API real
+    // Calcular distancia aproximada entre ciudades para precios más realistas
+    const fromCity = request.from_address.city.toLowerCase();
+    const toCity = request.to_address.city.toLowerCase();
+    
+    let distanceMultiplier = 1;
+    if (fromCity.includes('méxico') && toCity.includes('guadalajara')) distanceMultiplier = 1.2;
+    else if (fromCity.includes('méxico') && toCity.includes('monterrey')) distanceMultiplier = 1.4;
+    else if (fromCity.includes('méxico') && toCity.includes('cancún')) distanceMultiplier = 1.8;
+    else if (Math.abs(fromCity.length - toCity.length) > 3) distanceMultiplier = 1.3;
+    
+    // Simular delay realista de API
+    await new Promise(resolve => setTimeout(resolve, 1200 + Math.random() * 800));
 
     const quotes = [
       {
         carrier: 'FedEx',
         service: 'FedEx Express',
-        price: Math.round((120 + (baseWeight * 15)) * (isInternational ? 2.5 : 1)),
+        price: Math.round((120 + (baseWeight * 15)) * distanceMultiplier * (isInternational ? 2.5 : 1)),
         currency: 'MXN',
         delivery_time: isInternational ? '3-5 días hábiles' : '1-2 días hábiles',
         carrier_code: 'FEDEX',
@@ -149,7 +160,7 @@ export class MienvioAPI {
       {
         carrier: 'DHL',
         service: 'DHL Express',
-        price: Math.round((95 + (baseWeight * 12)) * (isInternational ? 2.2 : 1)),
+        price: Math.round((95 + (baseWeight * 12)) * distanceMultiplier * (isInternational ? 2.2 : 1)),
         currency: 'MXN',
         delivery_time: isInternational ? '4-6 días hábiles' : '2-3 días hábiles',
         carrier_code: 'DHL',
@@ -160,7 +171,7 @@ export class MienvioAPI {
       {
         carrier: 'Estafeta',
         service: 'Estafeta Express',
-        price: Math.round((75 + (baseWeight * 8)) * (isInternational ? 1.8 : 1)),
+        price: Math.round((75 + (baseWeight * 8)) * distanceMultiplier * (isInternational ? 1.8 : 1)),
         currency: 'MXN',
         delivery_time: isInternational ? '5-7 días hábiles' : '2-4 días hábiles',
         carrier_code: 'ESTAFETA',
@@ -171,7 +182,7 @@ export class MienvioAPI {
       {
         carrier: 'UPS',
         service: 'UPS Express',
-        price: Math.round((110 + (baseWeight * 13)) * (isInternational ? 2.3 : 1)),
+        price: Math.round((110 + (baseWeight * 13)) * distanceMultiplier * (isInternational ? 2.3 : 1)),
         currency: 'MXN',
         delivery_time: isInternational ? '3-5 días hábiles' : '1-3 días hábiles',
         carrier_code: 'UPS',
