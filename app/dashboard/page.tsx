@@ -115,7 +115,55 @@ export default function Dashboard() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900">Envíos Recientes</h2>
             <Link href="/dashboard/shipments" className="text-primary-600 hover:text-primary-700 font-medium">
-              Ver todos
+              Ver todos →
+            </Link>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 mb-8">
+            <Link
+              href="/dashboard/new-shipment"
+              className="block p-6 bg-white rounded-lg shadow border hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                  <span className="text-primary-600 font-bold text-xl">+</span>
+                </div>
+                <div className="ml-4">
+                  <div className="font-semibold text-gray-900">Nuevo Envío</div>
+                  <div className="text-sm text-gray-600">Crear envío paso a paso</div>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/dashboard/analytics"
+              className="block p-6 bg-white rounded-lg shadow border hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <span className="text-green-600 font-bold text-xl">📊</span>
+                </div>
+                <div className="ml-4">
+                  <div className="font-semibold text-gray-900">Analytics</div>
+                  <div className="text-sm text-gray-600">Ver reportes detallados</div>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/track"
+              className="block p-6 bg-white rounded-lg shadow border hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <span className="text-blue-600 font-bold text-xl">🔍</span>
+                </div>
+                <div className="ml-4">
+                  <div className="font-semibold text-gray-900">Rastrear</div>
+                  <div className="text-sm text-gray-600">Buscar cualquier envío</div>
+                </div>
+              </div>
             </Link>
           </div>
           

@@ -77,10 +77,40 @@ export default function NewShipment() {
     }
   }
 
-  const handleCreateShipment = () => {
-    alert('¡Envío creado exitosamente! (Modo demo)')
-    // En producción: crear envío real y generar etiqueta
-    window.location.href = '/dashboard/shipments'
+  const handleCreateShipment = async () => {
+    setLoading(true)
+    
+    try {
+      const response = await fetch('/api/shipments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          selectedCarrier: formData.selectedCarrier,
+        }),
+      })
+
+      const data = await response.json()
+      
+      if (data.success) {
+        alert(`¡Envío creado exitosamente!\nID: ${data.shipment.id}\nTracking: ${data.shipment.trackingNumber}`)
+        
+        // Descargar etiqueta automáticamente
+        window.open(`/api/shipments/${data.shipment.id}/label`, '_blank')
+        
+        // Redirect al dashboard
+        window.location.href = '/dashboard/shipments'
+      } else {
+        alert('Error creando envío: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error al crear envío')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

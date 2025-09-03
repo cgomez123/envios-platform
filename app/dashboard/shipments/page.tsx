@@ -277,14 +277,23 @@ export default function Shipments() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <button className="text-primary-600 hover:text-primary-700">
-                          Ver
+                        <button 
+                          onClick={() => window.open(`/tracking/${shipment.trackingNumber}`, '_blank')}
+                          className="text-primary-600 hover:text-primary-700"
+                        >
+                          🔍 Ver
                         </button>
-                        <button className="text-gray-600 hover:text-gray-700">
-                          Tracking
+                        <button 
+                          onClick={() => window.open(`/tracking/${shipment.trackingNumber}`, '_blank')}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          📍 Track
                         </button>
-                        <button className="text-gray-600 hover:text-gray-700">
-                          PDF
+                        <button 
+                          onClick={() => window.open(`/api/shipments/${shipment.id}/label`, '_blank')}
+                          className="text-green-600 hover:text-green-700"
+                        >
+                          📄 PDF
                         </button>
                       </div>
                     </td>
