@@ -11,6 +11,9 @@ interface Quote {
   icon: string;
   color: string;
   features: string[];
+  service?: string;
+  trackingIncluded?: boolean;
+  insuranceIncluded?: boolean;
 }
 
 export function ShippingCalculator() {
@@ -25,37 +28,60 @@ export function ShippingCalculator() {
   const [loading, setLoading] = useState(false)
 
   const handleCalculate = async () => {
+    // Validar que todos los campos estén llenos
+    if (!formData.from || !formData.to || !formData.weight) {
+      alert('Por favor completa todos los campos obligatorios')
+      return
+    }
+
     setLoading(true)
-    // Simular llamada a API
-    setTimeout(() => {
-      setQuotes([
-        {
-          carrier: 'FedEx Express',
-          price: 245,
-          time: '1-2 días',
-          icon: 'FX',
-          color: 'green',
-          features: ['Rastreo en tiempo real', 'Seguro incluido']
+    
+    try {
+      const response = await fetch('/api/shipping/quote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          carrier: 'DHL Standard',
-          price: 180,
-          time: '2-3 días',
-          icon: 'DH',
-          color: 'blue',
-          features: ['Mejor precio', 'Confiable']
-        },
-        {
-          carrier: 'Estafeta',
-          price: 145,
-          time: '3-4 días',
-          icon: 'ES',
-          color: 'purple',
-          features: ['Económico', 'Nacional']
-        }
-      ])
+        body: JSON.stringify({
+          from: formData.from,
+          to: formData.to,
+          weight: formData.weight,
+          dimensions: formData.dimensions
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al obtener cotizaciones')
+      }
+
+      if (data.success && data.quotes) {
+        // Transformar para nuestro componente
+        const transformedQuotes = data.quotes.map((quote: any) => ({
+          carrier: quote.carrier,
+          price: quote.price,
+          time: quote.deliveryTime,
+          icon: quote.icon,
+          color: quote.color,
+          features: quote.features,
+          service: quote.service,
+          trackingIncluded: quote.trackingIncluded,
+          insuranceIncluded: quote.insuranceIncluded
+        }))
+        
+        setQuotes(transformedQuotes)
+      } else {
+        throw new Error('No se encontraron cotizaciones disponibles')
+      }
+
+    } catch (error) {
+      console.error('Error:', error)
+      alert('Error al obtener cotizaciones. Inténtalo de nuevo.')
+      setQuotes([])
+    } finally {
       setLoading(false)
-    }, 1500)
+    }
   }
 
   return (
@@ -74,41 +100,49 @@ export function ShippingCalculator() {
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Desde (Origen)
+                Desde (Origen) *
               </label>
               <input
                 type="text"
-                placeholder="Ciudad de México, CDMX"
+                placeholder="Ej: Ciudad de México, CDMX"
                 className="input-field"
                 value={formData.from}
                 onChange={(e) => setFormData({...formData, from: e.target.value})}
+                required
               />
+              <p className="text-xs text-gray-500 mt-1">Ciudad, Estado</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hasta (Destino)
+                Hasta (Destino) *
               </label>
               <input
                 type="text"
-                placeholder="Guadalajara, JAL"
+                placeholder="Ej: Guadalajara, JAL"
                 className="input-field"
                 value={formData.to}
                 onChange={(e) => setFormData({...formData, to: e.target.value})}
+                required
               />
+              <p className="text-xs text-gray-500 mt-1">Ciudad, Estado</p>
             </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Peso (kg)
+                Peso (kg) *
               </label>
               <input
                 type="number"
                 placeholder="2.5"
+                min="0.1"
+                max="100"
+                step="0.1"
                 className="input-field"
                 value={formData.weight}
                 onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                required
               />
             </div>
             <div>
@@ -200,6 +234,21 @@ export function ShippingCalculator() {
                           <ClockIcon className="h-4 w-4" />
                           <span>{quote.time}</span>
                         </div>
+                        {quote.features && quote.features.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {quote.features.map((feature: string, featureIndex: number) => (
+                              <span
+                                key={featureIndex}
+                                className={`text-xs px-2 py-1 rounded-full ${
+                                  quote.color === 'green' ? 'bg-green-100 text-green-700' :
+                                  quote.color === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                                }`}
+                              >
+                                {feature}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="text-right">

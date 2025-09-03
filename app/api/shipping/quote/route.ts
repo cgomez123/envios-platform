@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { mienvioAPI } from '@/lib/mienvio-api'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,59 +14,67 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Simular cotizaciones de diferentes paqueterías
-    // En producción, aquí llamarías a las APIs reales
-    const quotes = [
-      {
-        carrier: 'FedEx Express',
-        service: 'Overnight',
-        price: 245.50,
-        currency: 'MXN',
-        deliveryTime: '1-2 días hábiles',
-        trackingIncluded: true,
-        insuranceIncluded: true,
-        carrierLogo: '/logos/fedex.png'
-      },
-      {
-        carrier: 'DHL Express',
-        service: 'Express Worldwide',
-        price: 180.75,
-        currency: 'MXN',
-        deliveryTime: '2-3 días hábiles',
-        trackingIncluded: true,
-        insuranceIncluded: true,
-        carrierLogo: '/logos/dhl.png'
-      },
-      {
-        carrier: 'Estafeta',
-        service: 'Express Nacional',
-        price: 145.00,
-        currency: 'MXN',
-        deliveryTime: '3-4 días hábiles',
-        trackingIncluded: true,
-        insuranceIncluded: false,
-        carrierLogo: '/logos/estafeta.png'
-      },
-      {
-        carrier: 'UPS',
-        service: 'UPS Express',
-        price: 220.30,
-        currency: 'MXN',
-        deliveryTime: '1-3 días hábiles',
-        trackingIncluded: true,
-        insuranceIncluded: true,
-        carrierLogo: '/logos/ups.png'
+    // Parsear direcciones (formato simple por ahora)
+    const parseAddress = (address: string) => {
+      const parts = address.split(',').map(p => p.trim())
+      return {
+        city: parts[0] || address,
+        state: parts[1] || 'CDMX',
+        postal_code: '01000', // Por ahora usamos un CP genérico
+        country: 'MX'
       }
-    ]
+    }
 
-    // Simular delay de API real
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Preparar request para Mienvío
+    const mienvioRequest = {
+      origin: parseAddress(from),
+      destination: parseAddress(to),
+      package: {
+        weight: parseFloat(weight) || 1,
+        length: parseFloat(dimensions?.length) || 20,
+        width: parseFloat(dimensions?.width) || 15,
+        height: parseFloat(dimensions?.height) || 10,
+      }
+    }
+
+    // Llamar a API de Mienvío
+    const mienvioResponse = await mienvioAPI.getQuotes(mienvioRequest)
+
+    if (!mienvioResponse.success) {
+      return NextResponse.json(
+        { error: mienvioResponse.error || 'Error al obtener cotizaciones' },
+        { status: 500 }
+      )
+    }
+
+    // Transformar respuesta al formato de nuestro frontend
+    const quotes = mienvioResponse.data.map((quote, index) => ({
+      id: `quote_${index}`,
+      carrier: quote.carrier,
+      service: quote.service,
+      price: quote.price,
+      currency: quote.currency,
+      deliveryTime: quote.delivery_time,
+      trackingIncluded: quote.tracking_included,
+      insuranceIncluded: quote.insurance_included,
+      carrierCode: quote.carrier_code,
+      serviceCode: quote.service_code,
+      // Asignar colores para UI
+      color: index % 3 === 0 ? 'green' : index % 3 === 1 ? 'blue' : 'purple',
+      icon: quote.carrier_code.substring(0, 2).toUpperCase(),
+      features: [
+        quote.tracking_included ? 'Rastreo incluido' : '',
+        quote.insurance_included ? 'Seguro incluido' : '',
+        quote.delivery_time.includes('1-2') ? 'Entrega rápida' : 'Precio competitivo'
+      ].filter(Boolean)
+    }))
 
     return NextResponse.json({
       success: true,
-      quotes: quotes.sort((a, b) => a.price - b.price), // Ordenar por precio
-      requestId: `quote_${Date.now()}`,
-      timestamp: new Date().toISOString()
+      quotes: quotes,
+      requestId: `mienvio_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      source: 'mienvio_api'
     })
 
   } catch (error) {
