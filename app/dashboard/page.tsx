@@ -86,8 +86,16 @@ export default function Dashboard() {
           {stats.map((stat) => (
             <div key={stat.name} className="card">
               <div className="flex items-center">
-                <div className={`p-3 bg-${stat.color}-100 rounded-lg`}>
-                  <stat.icon className={`h-6 w-6 text-${stat.color}-600`} />
+                <div className={`p-3 rounded-lg ${
+                  stat.color === 'blue' ? 'bg-blue-100' :
+                  stat.color === 'green' ? 'bg-green-100' :
+                  stat.color === 'yellow' ? 'bg-yellow-100' : 'bg-purple-100'
+                }`}>
+                  <stat.icon className={`h-6 w-6 ${
+                    stat.color === 'blue' ? 'text-blue-600' :
+                    stat.color === 'green' ? 'text-green-600' :
+                    stat.color === 'yellow' ? 'text-yellow-600' : 'text-purple-600'
+                  }`} />
                 </div>
                 <div className="ml-4">
                   <div className="text-sm font-medium text-gray-500">

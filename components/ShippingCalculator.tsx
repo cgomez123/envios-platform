@@ -4,6 +4,15 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { TruckIcon, ClockIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 
+interface Quote {
+  carrier: string;
+  price: number;
+  time: string;
+  icon: string;
+  color: string;
+  features: string[];
+}
+
 export function ShippingCalculator() {
   const [formData, setFormData] = useState({
     from: '',
@@ -12,7 +21,7 @@ export function ShippingCalculator() {
     dimensions: { length: '', width: '', height: '' }
   })
   
-  const [quotes, setQuotes] = useState([])
+  const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(false)
 
   const handleCalculate = async () => {
@@ -169,35 +178,35 @@ export function ShippingCalculator() {
                 Opciones Disponibles
               </h3>
               <div className="space-y-3">
-                {quotes.map((quote: any, index) => (
+                {quotes.map((quote: Quote, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex justify-between items-center p-4 bg-${quote.color}-50 border border-${quote.color}-200 rounded-lg hover:shadow-md transition-shadow`}
+                    className={`flex justify-between items-center p-4 ${quote.color === 'green' ? 'bg-green-50 border-green-200' : quote.color === 'blue' ? 'bg-blue-50 border-blue-200' : 'bg-purple-50 border-purple-200'} rounded-lg hover:shadow-md transition-shadow`}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 bg-${quote.color}-100 rounded-full flex items-center justify-center`}>
-                        <span className={`text-${quote.color}-600 font-bold text-sm`}>
+                      <div className={`w-10 h-10 ${quote.color === 'green' ? 'bg-green-100' : quote.color === 'blue' ? 'bg-blue-100' : 'bg-purple-100'} rounded-full flex items-center justify-center`}>
+                        <span className={`${quote.color === 'green' ? 'text-green-600' : quote.color === 'blue' ? 'text-blue-600' : 'text-purple-600'} font-bold text-sm`}>
                           {quote.icon}
                         </span>
                       </div>
                       <div>
-                        <div className={`font-medium text-${quote.color}-900`}>
+                        <div className={`font-medium ${quote.color === 'green' ? 'text-green-900' : quote.color === 'blue' ? 'text-blue-900' : 'text-purple-900'}`}>
                           {quote.carrier}
                         </div>
-                        <div className={`text-sm text-${quote.color}-600 flex items-center space-x-1`}>
+                        <div className={`text-sm ${quote.color === 'green' ? 'text-green-600' : quote.color === 'blue' ? 'text-blue-600' : 'text-purple-600'} flex items-center space-x-1`}>
                           <ClockIcon className="h-4 w-4" />
                           <span>{quote.time}</span>
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className={`text-2xl font-bold text-${quote.color}-900`}>
+                      <div className={`text-2xl font-bold ${quote.color === 'green' ? 'text-green-900' : quote.color === 'blue' ? 'text-blue-900' : 'text-purple-900'}`}>
                         ${quote.price}
                       </div>
-                      <button className={`text-sm bg-${quote.color}-600 text-white px-4 py-1 rounded-full hover:bg-${quote.color}-700 transition-colors`}>
+                      <button className={`text-sm ${quote.color === 'green' ? 'bg-green-600 hover:bg-green-700' : quote.color === 'blue' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-purple-600 hover:bg-purple-700'} text-white px-4 py-1 rounded-full transition-colors`}>
                         Seleccionar
                       </button>
                     </div>
