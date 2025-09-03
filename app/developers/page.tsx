@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { DocumentDuplicateIcon, CheckIcon } from '@heroicons/react/24/outline'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 
 export default function DevelopersPage() {
   const [copiedSection, setCopiedSection] = useState<string | null>(null)
@@ -183,7 +185,9 @@ shipmaster.createShippingWidget('shipping-calculator', {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-grow bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -416,6 +420,8 @@ shipmaster.createShippingWidget('shipping-calculator', {
           </div>
         </div>
       </div>
+      </main>
+      <Footer />
     </div>
   )
 }

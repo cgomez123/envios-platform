@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { CheckIcon } from '@heroicons/react/24/solid'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 
 const tiers = [
   {
@@ -55,7 +57,10 @@ const tiers = [
 
 export default function Pricing() {
   return (
-    <div className="bg-white py-24">
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-grow">
+        <div className="bg-white py-24">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
@@ -135,6 +140,9 @@ export default function Pricing() {
           </Link>
         </div>
       </div>
+        </div>
+      </main>
+      <Footer />
     </div>
   )
 }
