@@ -68,6 +68,36 @@ export default function Dashboard() {
           </Link>
 
           <Link
+            href="/dashboard/advanced"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 text-primary-600 group-hover:scale-110 transition-transform flex items-center justify-center bg-primary-100 rounded-lg">
+                <span className="font-bold">⚡</span>
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900">Dashboard Pro</div>
+                <div className="text-sm text-gray-600">Métricas avanzadas</div>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/dashboard/bulk-shipments"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 text-primary-600 group-hover:scale-110 transition-transform flex items-center justify-center bg-orange-100 rounded-lg">
+                <span className="font-bold">📦</span>
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900">Envíos Masivos</div>
+                <div className="text-sm text-gray-600">Upload CSV</div>
+              </div>
+            </div>
+          </Link>
+
+          <Link
             href="/dashboard/settings"
             className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow group"
           >
@@ -75,7 +105,22 @@ export default function Dashboard() {
               <Cog6ToothIcon className="h-8 w-8 text-primary-600 group-hover:scale-110 transition-transform" />
               <div>
                 <div className="font-semibold text-gray-900">Configuración</div>
-                <div className="text-sm text-gray-600">Ajustes</div>
+                <div className="text-sm text-gray-600">API Keys & Ajustes</div>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/dashboard/notifications"
+            className="bg-white p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-center space-x-3">
+              <div className="h-8 w-8 text-primary-600 group-hover:scale-110 transition-transform flex items-center justify-center bg-red-100 rounded-lg">
+                <span className="font-bold">🔔</span>
+              </div>
+              <div>
+                <div className="font-semibold text-gray-900">Notificaciones</div>
+                <div className="text-sm text-gray-600">Centro de alertas</div>
               </div>
             </div>
           </Link>
