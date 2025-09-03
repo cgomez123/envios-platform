@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { use } from 'react'
 import { 
   TruckIcon, 
   MapPinIcon, 
@@ -72,8 +71,8 @@ const mockTimelineData: Record<string, TimelineEvent[]> = {
   ]
 }
 
-export default function TrackingPage({ params }: { params: Promise<{ trackingNumber: string }> }) {
-  const { trackingNumber } = use(params)
+export default function TrackingPage({ params }: { params: { trackingNumber: string } }) {
+  const { trackingNumber } = params
   const [timeline, setTimeline] = useState<TimelineEvent[]>([])
   const [shipmentInfo, setShipmentInfo] = useState<any>(null)
   const [loading, setLoading] = useState(true)
