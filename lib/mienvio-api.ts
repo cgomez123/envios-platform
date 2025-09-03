@@ -38,45 +38,82 @@ interface MienvioQuoteResponse {
 
 export class MienvioAPI {
   private baseUrl = process.env.MIENVIO_API_URL || 'https://production.mienvio.mx/api/v2';
-  private apiKey = process.env.MIENVIO_API_KEY || 'demo-key';
-  private username = process.env.MIENVIO_USERNAME || 'demo-user';
-  private password = process.env.MIENVIO_PASSWORD || 'demo-pass';
+  private apiKey = process.env.MIENVIO_API_KEY;
+  private username = process.env.MIENVIO_USERNAME;
+  private password = process.env.MIENVIO_PASSWORD;
+
+  private isRealCredentials(): boolean {
+    return !!(this.apiKey && this.username && this.password && 
+              this.apiKey !== 'demo-key' && 
+              this.apiKey !== 'REEMPLAZA_CON_TU_API_KEY');
+  }
 
   private getHeaders() {
+    if (!this.isRealCredentials()) {
+      return {
+        'Content-Type': 'application/json',
+      };
+    }
+
     return {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${this.apiKey}`,
       'X-Api-Key': this.apiKey,
+      'X-Username': this.username,
+      'X-Password': this.password
     };
   }
 
   async getQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {
     try {
-      // En modo demo, simulamos respuesta real
-      if (this.apiKey === 'demo-key') {
+      // Si no tenemos credenciales reales, usar modo demo
+      if (!this.isRealCredentials()) {
+        console.log('🧪 Usando modo DEMO - No hay credenciales reales configuradas')
         return this.getDemoQuotes(request);
       }
+
+      console.log('🔑 Usando API REAL de Mienvío - Solo cotización (sin cargos)');
+
+      const requestBody = {
+        origin: request.origin,
+        destination: request.destination,
+        package: request.package,
+        delivery_type: 'standard'
+      };
+
+      console.log('📤 Request a Mienvío:', JSON.stringify(requestBody, null, 2));
 
       const response = await fetch(`${this.baseUrl}/shipments/rates`, {
         method: 'POST',
         headers: this.getHeaders(),
-        body: JSON.stringify({
-          origin: request.origin,
-          destination: request.destination,
-          package: request.package,
-          delivery_type: 'standard'
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      const responseText = await response.text();
+      console.log('📥 Respuesta de Mienvío:', response.status, responseText);
+
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}`);
+        throw new Error(`Error ${response.status}: ${response.statusText}. Response: ${responseText}`);
       }
 
-      const data = await response.json();
+      const data = JSON.parse(responseText);
       
+      // Transformar respuesta de Mienvío al formato estándar
+      const transformedData = data.rates ? data.rates.map((rate: any) => ({
+        carrier: rate.carrier_name || rate.carrier,
+        service: rate.service_name || rate.service,
+        price: rate.price || rate.total_price,
+        currency: rate.currency || 'MXN',
+        delivery_time: rate.delivery_time || rate.estimated_days,
+        carrier_code: rate.carrier_code || rate.carrier,
+        service_code: rate.service_code || rate.service,
+        tracking_included: rate.tracking_included !== false,
+        insurance_included: rate.insurance_included || false,
+      })) : [];
+
       return {
         success: true,
-        data: data.rates || []
+        data: transformedData
       };
 
     } catch (error) {
