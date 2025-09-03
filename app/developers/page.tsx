@@ -188,8 +188,8 @@ shipmaster.createShippingWidget('shipping-calculator', {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          {/* Header */}
         <div className="text-center mb-12">
           <div className="w-16 h-16 bg-primary-600 rounded-xl flex items-center justify-center mx-auto mb-6">
             <span className="text-white font-bold text-2xl">API</span>
@@ -419,7 +419,7 @@ shipmaster.createShippingWidget('shipping-calculator', {
             </div>
           </div>
         </div>
-      </div>
+        </div>
       </main>
       <Footer />
     </div>

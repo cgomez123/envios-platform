@@ -61,8 +61,8 @@ export default function Pricing() {
       <Navbar />
       <main className="flex-grow">
         <div className="bg-white py-24">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
+          <div className="max-w-7xl mx-auto px-4">
+            {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Precios transparentes para cada necesidad
@@ -138,8 +138,7 @@ export default function Pricing() {
           >
             Contáctanos y te ayudamos
           </Link>
-        </div>
-      </div>
+          </div>
         </div>
       </main>
       <Footer />
