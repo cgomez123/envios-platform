@@ -48,10 +48,12 @@ export default function NewShipment() {
     setLoading(true)
     
     try {
+      // Forzar modo demo para formulario de envíos hasta que Mienvío esté configurado
       const response = await fetch('/api/shipping/quote', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Demo-Mode': 'true', // Forzar modo demo
         },
         body: JSON.stringify({
           from: `${formData.senderCity}, ${formData.senderState}`,
@@ -66,12 +68,15 @@ export default function NewShipment() {
       })
 
       const data = await response.json()
-      if (data.success) {
+      if (data.success && data.quotes) {
         setQuotes(data.quotes)
         setStep(3)
+      } else {
+        throw new Error(data.error || 'No se encontraron cotizaciones')
       }
     } catch (error) {
-      alert('Error al obtener cotizaciones')
+      console.error('Error obteniendo cotizaciones:', error)
+      alert('Error al obtener cotizaciones: ' + (error instanceof Error ? error.message : 'Error desconocido'))
     } finally {
       setLoading(false)
     }

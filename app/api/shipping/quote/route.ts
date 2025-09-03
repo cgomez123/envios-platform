@@ -14,6 +14,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Verificar si se forzó modo demo
+    const forceDemoMode = request.headers.get('X-Demo-Mode') === 'true'
+
     // Parsear direcciones usando el formato correcto de Mienvío
     const parseAddress = (address: string) => {
       const parts = address.split(',').map(p => p.trim())
@@ -39,7 +42,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Llamar a API de Mienvío
-    const mienvioResponse = await mienvioAPI.getQuotes(mienvioRequest)
+    const mienvioResponse = forceDemoMode 
+      ? await mienvioAPI.getDemoQuotes(mienvioRequest)
+      : await mienvioAPI.getQuotes(mienvioRequest)
 
     if (!mienvioResponse.success) {
       return NextResponse.json(

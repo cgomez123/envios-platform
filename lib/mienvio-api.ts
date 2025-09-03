@@ -127,7 +127,7 @@ export class MienvioAPI {
     }
   }
 
-  private async getDemoQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {
+  async getDemoQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {
     // Simulación SÚPER realista basada en peso, distancia y ubicación
     const baseWeight = request.parcel.weight || 1;
     const isInternational = request.to_address.country !== 'MX';
