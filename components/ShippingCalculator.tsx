@@ -106,9 +106,11 @@ export function ShippingCalculator() {
               <input
                 type="text"
                 placeholder="Ej: Ciudad de México, CDMX"
-                className="input-field"
+                className="input-field bg-white cursor-text"
                 value={formData.from}
                 onChange={(e) => setFormData({...formData, from: e.target.value})}
+                onClick={(e) => e.currentTarget.focus()}
+                onFocus={(e) => e.currentTarget.select()}
                 required
               />
               <p className="text-xs text-gray-500 mt-1">Ciudad, Estado</p>
@@ -120,9 +122,11 @@ export function ShippingCalculator() {
               <input
                 type="text"
                 placeholder="Ej: Guadalajara, JAL"
-                className="input-field"
+                className="input-field bg-white cursor-text"
                 value={formData.to}
                 onChange={(e) => setFormData({...formData, to: e.target.value})}
+                onClick={(e) => e.currentTarget.focus()}
+                onFocus={(e) => e.currentTarget.select()}
                 required
               />
               <p className="text-xs text-gray-500 mt-1">Ciudad, Estado</p>
@@ -140,9 +144,11 @@ export function ShippingCalculator() {
                 min="0.1"
                 max="100"
                 step="0.1"
-                className="input-field"
+                className="input-field bg-white"
                 value={formData.weight}
                 onChange={(e) => setFormData({...formData, weight: e.target.value})}
+                onClick={(e) => e.currentTarget.focus()}
+                onFocus={(e) => e.currentTarget.select()}
                 required
               />
             </div>
@@ -153,9 +159,11 @@ export function ShippingCalculator() {
               <input
                 type="number"
                 placeholder="30"
-                className="input-field"
+                className="input-field bg-white cursor-text"
                 value={formData.dimensions.length}
                 onChange={(e) => setFormData({...formData, dimensions: {...formData.dimensions, length: e.target.value}})}
+                onClick={(e) => e.currentTarget.focus()}
+                onFocus={(e) => e.currentTarget.select()}
               />
             </div>
             <div>
@@ -165,9 +173,11 @@ export function ShippingCalculator() {
               <input
                 type="number"
                 placeholder="20"
-                className="input-field"
+                className="input-field bg-white cursor-text"
                 value={formData.dimensions.width}
                 onChange={(e) => setFormData({...formData, dimensions: {...formData.dimensions, width: e.target.value}})}
+                onClick={(e) => e.currentTarget.focus()}
+                onFocus={(e) => e.currentTarget.select()}
               />
             </div>
             <div>
@@ -177,9 +187,11 @@ export function ShippingCalculator() {
               <input
                 type="number"
                 placeholder="15"
-                className="input-field"
+                className="input-field bg-white cursor-text"
                 value={formData.dimensions.height}
                 onChange={(e) => setFormData({...formData, dimensions: {...formData.dimensions, height: e.target.value}})}
+                onClick={(e) => e.currentTarget.focus()}
+                onFocus={(e) => e.currentTarget.select()}
               />
             </div>
           </div>
