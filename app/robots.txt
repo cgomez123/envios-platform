@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# SEO-friendly paths
+Allow: /pricing
+Allow: /developers
+Allow: /shopify
+Allow: /track
+Allow: /demo/shopify-simulation
+
+# Block internal/private areas
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /test-api
+Disallow: /debug-api
+Disallow: /login
+Disallow: /signup
+
+# Block demo/testing content from search engines
+Disallow: /demo/
+User-agent: Googlebot
+Disallow: /demo/
+
+Sitemap: https://envios-platform.vercel.app/sitemap.xml

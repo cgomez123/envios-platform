@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node tests/smoke-test.js",
+    "test:build": "npm run build && npm run test",
+    "deploy:vercel": "vercel --prod",
+    "clean": "rm -rf .next && npm run dev"
   },
   "dependencies": {
     "@heroicons/react": "^2.0.18",
