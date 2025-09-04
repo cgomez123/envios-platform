@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { TruckIcon, ClockIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 
@@ -18,11 +19,34 @@ interface Quote {
 
 export function ShippingCalculator() {
   const [formData, setFormData] = useState({
-    from: 'Ciudad de México, CDMX',
-    to: 'Guadalajara, JAL',
-    weight: '2.5',
-    dimensions: { length: '20', width: '30', height: '15' }
+    from: '',
+    to: '',
+    weight: '',
+    dimensions: { length: '', width: '', height: '' }
   })
+
+  // Forzar valores por defecto después del mount
+  React.useEffect(() => {
+    setTimeout(() => {
+      setFormData({
+        from: 'Ciudad de México, CDMX',
+        to: 'Guadalajara, JAL',
+        weight: '2.5',
+        dimensions: { length: '20', width: '30', height: '15' }
+      })
+      
+      // También setear directamente en los inputs como backup
+      const inputs = document.querySelectorAll('input')
+      inputs.forEach(input => {
+        if (input.placeholder.includes('Ciudad de México')) input.value = 'Ciudad de México, CDMX'
+        if (input.placeholder.includes('Guadalajara')) input.value = 'Guadalajara, JAL'
+        if (input.placeholder === '2.5') input.value = '2.5'
+        if (input.placeholder === '30') input.value = '20'
+        if (input.placeholder === '20') input.value = '30'
+        if (input.placeholder === '15') input.value = '15'
+      })
+    }, 100)
+  }, [])
   
   const [quotes, setQuotes] = useState<Quote[]>([])
   const [loading, setLoading] = useState(false)
@@ -106,12 +130,19 @@ export function ShippingCalculator() {
               <input
                 type="text"
                 placeholder="Ej: Ciudad de México, CDMX"
-                className="input-field bg-white cursor-text"
-                value={formData.from}
-                onChange={(e) => setFormData({...formData, from: e.target.value})}
-                onClick={(e) => e.currentTarget.focus()}
-                onFocus={(e) => e.currentTarget.select()}
+                className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:ring-4 focus:ring-blue-200 focus:border-blue-500 bg-white text-gray-900 font-medium"
+                defaultValue=""
+                key={`from-${Date.now()}`}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setFormData(prev => ({...prev, from: e.target.value}));
+                }}
+                onInput={(e) => {
+                  setFormData(prev => ({...prev, from: (e.target as HTMLInputElement).value}));
+                }}
                 required
+                autoComplete="off"
+                spellCheck="false"
               />
               <p className="text-xs text-gray-500 mt-1">Ciudad, Estado</p>
             </div>
@@ -122,12 +153,19 @@ export function ShippingCalculator() {
               <input
                 type="text"
                 placeholder="Ej: Guadalajara, JAL"
-                className="input-field bg-white cursor-text"
-                value={formData.to}
-                onChange={(e) => setFormData({...formData, to: e.target.value})}
-                onClick={(e) => e.currentTarget.focus()}
-                onFocus={(e) => e.currentTarget.select()}
+                className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:ring-4 focus:ring-blue-200 focus:border-blue-500 bg-white text-gray-900 font-medium"
+                defaultValue=""
+                key={`to-${Date.now()}`}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setFormData(prev => ({...prev, to: e.target.value}));
+                }}
+                onInput={(e) => {
+                  setFormData(prev => ({...prev, to: (e.target as HTMLInputElement).value}));
+                }}
                 required
+                autoComplete="off"
+                spellCheck="false"
               />
               <p className="text-xs text-gray-500 mt-1">Ciudad, Estado</p>
             </div>
@@ -144,12 +182,18 @@ export function ShippingCalculator() {
                 min="0.1"
                 max="100"
                 step="0.1"
-                className="input-field bg-white"
-                value={formData.weight}
-                onChange={(e) => setFormData({...formData, weight: e.target.value})}
-                onClick={(e) => e.currentTarget.focus()}
-                onFocus={(e) => e.currentTarget.select()}
+                className="w-full px-4 py-3 border-2 border-green-300 rounded-lg focus:ring-4 focus:ring-green-200 focus:border-green-500 bg-white text-gray-900 font-bold text-center"
+                defaultValue=""
+                key={`weight-${Date.now()}`}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setFormData(prev => ({...prev, weight: e.target.value}));
+                }}
+                onInput={(e) => {
+                  setFormData(prev => ({...prev, weight: (e.target as HTMLInputElement).value}));
+                }}
                 required
+                autoComplete="off"
               />
             </div>
             <div>
@@ -159,11 +203,17 @@ export function ShippingCalculator() {
               <input
                 type="number"
                 placeholder="30"
-                className="input-field bg-white cursor-text"
-                value={formData.dimensions.length}
-                onChange={(e) => setFormData({...formData, dimensions: {...formData.dimensions, length: e.target.value}})}
-                onClick={(e) => e.currentTarget.focus()}
-                onFocus={(e) => e.currentTarget.select()}
+                className="w-full px-4 py-3 border-2 border-purple-300 rounded-lg focus:ring-4 focus:ring-purple-200 focus:border-purple-500 bg-white text-gray-900 font-bold text-center"
+                defaultValue=""
+                key={`length-${Date.now()}`}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setFormData(prev => ({...prev, dimensions: {...prev.dimensions, length: e.target.value}}));
+                }}
+                onInput={(e) => {
+                  setFormData(prev => ({...prev, dimensions: {...prev.dimensions, length: (e.target as HTMLInputElement).value}}));
+                }}
+                autoComplete="off"
               />
             </div>
             <div>
@@ -173,11 +223,17 @@ export function ShippingCalculator() {
               <input
                 type="number"
                 placeholder="20"
-                className="input-field bg-white cursor-text"
-                value={formData.dimensions.width}
-                onChange={(e) => setFormData({...formData, dimensions: {...formData.dimensions, width: e.target.value}})}
-                onClick={(e) => e.currentTarget.focus()}
-                onFocus={(e) => e.currentTarget.select()}
+                className="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:ring-4 focus:ring-orange-200 focus:border-orange-500 bg-white text-gray-900 font-bold text-center"
+                defaultValue=""
+                key={`width-${Date.now()}`}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setFormData(prev => ({...prev, dimensions: {...prev.dimensions, width: e.target.value}}));
+                }}
+                onInput={(e) => {
+                  setFormData(prev => ({...prev, dimensions: {...prev.dimensions, width: (e.target as HTMLInputElement).value}}));
+                }}
+                autoComplete="off"
               />
             </div>
             <div>
@@ -187,11 +243,17 @@ export function ShippingCalculator() {
               <input
                 type="number"
                 placeholder="15"
-                className="input-field bg-white cursor-text"
-                value={formData.dimensions.height}
-                onChange={(e) => setFormData({...formData, dimensions: {...formData.dimensions, height: e.target.value}})}
-                onClick={(e) => e.currentTarget.focus()}
-                onFocus={(e) => e.currentTarget.select()}
+                className="w-full px-4 py-3 border-2 border-red-300 rounded-lg focus:ring-4 focus:ring-red-200 focus:border-red-500 bg-white text-gray-900 font-bold text-center"
+                defaultValue=""
+                key={`height-${Date.now()}`}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setFormData(prev => ({...prev, dimensions: {...prev.dimensions, height: e.target.value}}));
+                }}
+                onInput={(e) => {
+                  setFormData(prev => ({...prev, dimensions: {...prev.dimensions, height: (e.target as HTMLInputElement).value}}));
+                }}
+                autoComplete="off"
               />
             </div>
           </div>
