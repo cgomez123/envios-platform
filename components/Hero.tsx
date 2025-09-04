@@ -47,7 +47,7 @@ export function Hero() {
               <Link href="/signup" className="btn-primary text-center">
                 Empezar Gratis - 14 días
               </Link>
-              <Link href="/demo" className="btn-secondary text-center">
+              <Link href="/demo/shopify-simulation" className="btn-secondary text-center">
                 Ver Demo en Vivo
               </Link>
             </div>
