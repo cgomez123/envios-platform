@@ -18,10 +18,10 @@ interface Quote {
 
 export function ShippingCalculator() {
   const [formData, setFormData] = useState({
-    from: '',
-    to: '',
-    weight: '',
-    dimensions: { length: '', width: '', height: '' }
+    from: 'Ciudad de México, CDMX',
+    to: 'Guadalajara, JAL',
+    weight: '2.5',
+    dimensions: { length: '20', width: '30', height: '15' }
   })
   
   const [quotes, setQuotes] = useState<Quote[]>([])
