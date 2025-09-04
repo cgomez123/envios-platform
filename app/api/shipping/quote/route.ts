@@ -14,14 +14,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verificar si se forzó modo demo
-    const forceDemoMode = request.headers.get('X-Demo-Mode') === 'true'
+    // Verificar si se solicita API real (por defecto usar real)
+    const useRealAPI = request.headers.get('X-Real-API') === 'true' || !request.headers.get('X-Demo-Mode')
 
     // Parsear direcciones usando el formato correcto de Mienvío
-    const parseAddress = (address: string) => {
-      const parts = address.split(',').map(p => p.trim())
+    const parseAddress = (addressInput: any) => {
+      // Si viene del ShippingCalculator, ya tiene el formato correcto
+      if (typeof addressInput === 'object' && addressInput.zipcode) {
+        return {
+          city: addressInput.city,
+          state: addressInput.state,
+          zipcode: addressInput.zipcode,
+          country: addressInput.country || 'MX'
+        }
+      }
+      
+      // Si viene como string, parsearlo
+      const parts = String(addressInput).split(',').map(p => p.trim())
       return {
-        city: parts[0] || address,
+        city: parts[0] || String(addressInput),
         state: parts[1] || 'CDMX',
         zipcode: '01000', // Por ahora usamos un CP genérico
         country: 'MX'
@@ -41,10 +52,12 @@ export async function POST(request: NextRequest) {
       packing_mode: 'package'
     }
 
-    // Llamar a API de Mienvío
-    const mienvioResponse = forceDemoMode 
-      ? await mienvioAPI.getDemoQuotes(mienvioRequest)
-      : await mienvioAPI.getQuotes(mienvioRequest)
+    console.log('🔍 Request procesado:', mienvioRequest);
+
+    // Llamar a API de Mienvío (usar real por defecto, demo solo si se fuerza)
+    const mienvioResponse = useRealAPI 
+      ? await mienvioAPI.getQuotes(mienvioRequest)
+      : await mienvioAPI.getDemoQuotes(mienvioRequest)
 
     if (!mienvioResponse.success) {
       return NextResponse.json(

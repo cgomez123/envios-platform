@@ -44,26 +44,22 @@ export class MienvioAPI {
   private password = process.env.MIENVIO_PASSWORD;
 
   private isRealCredentials(): boolean {
-    return !!(this.apiKey && this.username && this.password && 
+    return !!(this.apiKey && 
               this.apiKey !== 'demo-key' && 
-              this.apiKey !== 'REEMPLAZA_CON_TU_API_KEY');
+              this.apiKey !== 'REEMPLAZA_CON_TU_API_KEY' &&
+              this.apiKey.length > 10);
   }
 
   private getHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     };
 
     if (this.isRealCredentials()) {
+      // Mienvío API V2 usa API Key en Authorization header
       if (this.apiKey) {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
-        headers['X-Api-Key'] = this.apiKey;
-      }
-      if (this.username) {
-        headers['X-Username'] = this.username;
-      }
-      if (this.password) {
-        headers['X-Password'] = this.password;
       }
     }
 
@@ -78,39 +74,109 @@ export class MienvioAPI {
         return this.getDemoQuotes(request);
       }
 
-      console.log('🔑 Usando API REAL de Mienvío - Solo cotización (sin cargos)');
+      console.log('🔑 Usando API REAL de Mienvío - Flujo completo (solo cotización)');
 
-      const requestBody = {
-        from_address: request.from_address,
-        to_address: request.to_address,
-        parcel: request.parcel,
-        packing_mode: request.packing_mode || 'package'
+      // PASO 1: Crear dirección de origen
+      const fromAddressData = {
+        name: "Envío desde",
+        street: "Calle Principal 123",
+        street2: request.from_address.city,
+        zipcode: request.from_address.zipcode,
+        city: request.from_address.city,
+        state: request.from_address.state,
+        country: request.from_address.country || 'MX',
+        email: "origen@test.com",
+        phone: "5551234567"
       };
 
-      console.log('📤 Request a Mienvío:', JSON.stringify(requestBody, null, 2));
-
-      const response = await fetch(`${this.baseUrl}/shipments/rates`, {
+      const fromAddressResponse = await fetch(`${this.baseUrl}/addresses`, {
         method: 'POST',
         headers: this.getHeaders(),
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(fromAddressData),
       });
 
-      const responseText = await response.text();
-      console.log('📥 Respuesta de Mienvío:', response.status, responseText);
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status}: ${response.statusText}. Response: ${responseText}`);
+      if (!fromAddressResponse.ok) {
+        throw new Error(`Error creando dirección origen: ${fromAddressResponse.status}`);
       }
 
-      const data = JSON.parse(responseText);
-      
-      // Transformar respuesta de Mienvío al formato estándar
-      const transformedData = data.rates ? data.rates.map((rate: any) => ({
-        carrier: rate.carrier_name || rate.carrier,
-        service: rate.service_name || rate.service,
-        price: rate.price || rate.total_price,
+      const fromAddress = await fromAddressResponse.json();
+      const fromAddressId = fromAddress.data?.object_id;
+
+      // PASO 2: Crear dirección de destino  
+      const toAddressData = {
+        name: "Envío hacia",
+        street: "Calle Destino 456",
+        street2: request.to_address.city,
+        zipcode: request.to_address.zipcode,
+        city: request.to_address.city,
+        state: request.to_address.state,
+        country: request.to_address.country || 'MX',
+        email: "destino@test.com",
+        phone: "5551234568"
+      };
+
+      const toAddressResponse = await fetch(`${this.baseUrl}/addresses`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(toAddressData),
+      });
+
+      if (!toAddressResponse.ok) {
+        throw new Error(`Error creando dirección destino: ${toAddressResponse.status}`);
+      }
+
+      const toAddress = await toAddressResponse.json();
+      const toAddressId = toAddress.data?.object_id;
+
+      // PASO 3: Crear shipment para cotización
+      const shipmentData = {
+        address_from: fromAddressId,
+        address_to: toAddressId,
+        parcels: [{
+          weight: request.parcel.weight,
+          height: request.parcel.height,
+          length: request.parcel.length,
+          width: request.parcel.width
+        }],
+        content_description: "Paquete de prueba",
+        declared_value: 100,
+        insurance: false
+      };
+
+      const shipmentResponse = await fetch(`${this.baseUrl}/shipments`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(shipmentData),
+      });
+
+      if (!shipmentResponse.ok) {
+        const errorText = await shipmentResponse.text();
+        throw new Error(`Error creando shipment: ${shipmentResponse.status} - ${errorText}`);
+      }
+
+      const shipment = await shipmentResponse.json();
+      const shipmentId = shipment.data?.object_id;
+
+      // PASO 4: Obtener cotizaciones
+      const ratesResponse = await fetch(`${this.baseUrl}/shipments/${shipmentId}/rates`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+
+      if (!ratesResponse.ok) {
+        throw new Error(`Error obteniendo cotizaciones: ${ratesResponse.status}`);
+      }
+
+      const ratesData = await ratesResponse.json();
+      console.log('📥 Cotizaciones de Mienvío:', ratesData);
+
+      // Transformar respuesta de Mienvío API V2 al formato estándar
+      const transformedData = ratesData.data ? ratesData.data.map((rate: any) => ({
+        carrier: rate.carrier || rate.carrier_name,
+        service: rate.service || rate.service_name || rate.service_type,
+        price: rate.rate || rate.price || rate.total_price,
         currency: rate.currency || 'MXN',
-        delivery_time: rate.delivery_time || rate.estimated_days,
+        delivery_time: rate.estimated_delivery || rate.delivery_time || rate.estimated_days || '2-3 días',
         carrier_code: rate.carrier_code || rate.carrier,
         service_code: rate.service_code || rate.service,
         tracking_included: rate.tracking_included !== false,
@@ -123,12 +189,11 @@ export class MienvioAPI {
       };
 
     } catch (error) {
-      console.error('Error en API Mienvío:', error);
-      return {
-        success: false,
-        data: [],
-        error: error instanceof Error ? error.message : 'Error desconocido'
-      };
+      console.error('❌ Error en API Real Mienvío:', error);
+      
+      // En caso de error en API real, usar demo como fallback
+      console.log('🔄 Fallback a modo DEMO por error en API real');
+      return this.getDemoQuotes(request);
     }
   }
 

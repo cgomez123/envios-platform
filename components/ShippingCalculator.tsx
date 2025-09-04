@@ -41,6 +41,7 @@ export function ShippingCalculator() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-Real-API': 'true'
         },
         body: JSON.stringify({
           from: formData.from,

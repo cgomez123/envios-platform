@@ -53,7 +53,7 @@ export default function NewShipment() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Demo-Mode': 'true', // Forzar modo demo
+          'X-Real-API': 'true', // Forzar modo demo
         },
         body: JSON.stringify({
           from: `${formData.senderCity}, ${formData.senderState}`,
