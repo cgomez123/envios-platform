@@ -65,27 +65,49 @@ export function SimpleCalculator() {
                 <label className="block text-lg font-bold text-blue-600 mb-3">
                   🏠 DESDE (Origen) *
                 </label>
-                <input
-                  type="text"
-                  name="from"
-                  defaultValue="Ciudad de México, CDMX"
-                  className="w-full px-4 py-4 text-lg border-4 border-blue-400 rounded-xl focus:border-blue-600 bg-blue-50 font-bold"
-                  required
-                  style={{ fontSize: '18px', fontWeight: 'bold' }}
-                />
+                              <input
+                type="text"
+                name="from"
+                defaultValue="Ciudad de México, CDMX"
+                className="w-full px-4 py-4 text-lg border-4 border-blue-400 rounded-xl focus:border-blue-600 bg-blue-50 font-bold"
+                required
+                onClick={(e) => {
+                  e.currentTarget.readOnly = false;
+                  e.currentTarget.disabled = false;
+                  e.currentTarget.select();
+                }}
+                onFocus={(e) => e.currentTarget.select()}
+                style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 'bold',
+                  pointerEvents: 'all',
+                  userSelect: 'text'
+                }}
+              />
               </div>
               <div>
                 <label className="block text-lg font-bold text-blue-600 mb-3">
                   🎯 HASTA (Destino) *
                 </label>
-                <input
-                  type="text"
-                  name="to"
-                  defaultValue="Guadalajara, JAL"
-                  className="w-full px-4 py-4 text-lg border-4 border-blue-400 rounded-xl focus:border-blue-600 bg-blue-50 font-bold"
-                  required
-                  style={{ fontSize: '18px', fontWeight: 'bold' }}
-                />
+                              <input
+                type="text"
+                name="to"
+                defaultValue="Guadalajara, JAL"
+                className="w-full px-4 py-4 text-lg border-4 border-blue-400 rounded-xl focus:border-blue-600 bg-blue-50 font-bold"
+                required
+                onClick={(e) => {
+                  e.currentTarget.readOnly = false;
+                  e.currentTarget.disabled = false;
+                  e.currentTarget.select();
+                }}
+                onFocus={(e) => e.currentTarget.select()}
+                style={{ 
+                  fontSize: '18px', 
+                  fontWeight: 'bold',
+                  pointerEvents: 'all',
+                  userSelect: 'text'
+                }}
+              />
               </div>
             </div>
 
@@ -95,17 +117,28 @@ export function SimpleCalculator() {
                 <label className="block text-lg font-bold text-green-600 mb-3">
                   ⚖️ PESO (kg) *
                 </label>
-                <input
-                  type="number"
-                  name="weight"
-                  defaultValue="2.5"
-                  min="0.1"
-                  max="100"
-                  step="0.1"
-                  className="w-full px-4 py-4 text-xl border-4 border-green-400 rounded-xl focus:border-green-600 bg-green-50 font-bold text-center"
-                  required
-                  style={{ fontSize: '20px', fontWeight: 'bold' }}
-                />
+                              <input
+                type="number"
+                name="weight"
+                defaultValue="2.5"
+                min="0.1"
+                max="100"
+                step="0.1"
+                className="w-full px-4 py-4 text-xl border-4 border-green-400 rounded-xl focus:border-green-600 bg-green-50 font-bold text-center"
+                required
+                onClick={(e) => {
+                  e.currentTarget.readOnly = false;
+                  e.currentTarget.disabled = false;
+                  e.currentTarget.select();
+                }}
+                onFocus={(e) => e.currentTarget.select()}
+                style={{ 
+                  fontSize: '20px', 
+                  fontWeight: 'bold',
+                  pointerEvents: 'all',
+                  userSelect: 'text'
+                }}
+              />
               </div>
               <div>
                 <label className="block text-lg font-bold text-purple-600 mb-3">
@@ -116,7 +149,18 @@ export function SimpleCalculator() {
                   name="length"
                   defaultValue="20"
                   className="w-full px-4 py-4 text-xl border-4 border-purple-400 rounded-xl focus:border-purple-600 bg-purple-50 font-bold text-center"
-                  style={{ fontSize: '20px', fontWeight: 'bold' }}
+                  onClick={(e) => {
+                    e.currentTarget.readOnly = false;
+                    e.currentTarget.disabled = false;
+                    e.currentTarget.select();
+                  }}
+                  onFocus={(e) => e.currentTarget.select()}
+                  style={{ 
+                    fontSize: '20px', 
+                    fontWeight: 'bold',
+                    pointerEvents: 'all',
+                    userSelect: 'text'
+                  }}
                 />
               </div>
               <div>
