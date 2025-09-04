@@ -49,20 +49,25 @@ export class MienvioAPI {
               this.apiKey !== 'REEMPLAZA_CON_TU_API_KEY');
   }
 
-  private getHeaders() {
-    if (!this.isRealCredentials()) {
-      return {
-        'Content-Type': 'application/json',
-      };
+  private getHeaders(): Record<string, string> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (this.isRealCredentials()) {
+      if (this.apiKey) {
+        headers['Authorization'] = `Bearer ${this.apiKey}`;
+        headers['X-Api-Key'] = this.apiKey;
+      }
+      if (this.username) {
+        headers['X-Username'] = this.username;
+      }
+      if (this.password) {
+        headers['X-Password'] = this.password;
+      }
     }
 
-    return {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${this.apiKey}`,
-      'X-Api-Key': this.apiKey,
-      'X-Username': this.username,
-      'X-Password': this.password
-    };
+    return headers;
   }
 
   async getQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {

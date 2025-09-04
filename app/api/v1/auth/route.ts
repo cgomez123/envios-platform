@@ -53,19 +53,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Función helper para validar autenticación (no se exporta como Route)
-function validateAuth(request: NextRequest): boolean {
-  const authHeader = request.headers.get('Authorization')
-  const apiKey = request.headers.get('X-API-Key')
-  
-  if (!authHeader && !apiKey) {
-    return false
-  }
-
-  // Verificar Bearer token o API key directa
-  const token = authHeader?.replace('Bearer ', '') || apiKey
-  
-  return token ? validApiKeys.has(token.split('_')[0] + '_' + token.split('_')[1] + '_' + token.split('_')[2]) : false
-}
-
-export { validateAuth }

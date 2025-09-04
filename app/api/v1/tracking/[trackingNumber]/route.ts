@@ -88,7 +88,7 @@ export async function GET(
     // Si es acceso público, limitar información sensible
     if (isPublicAccess) {
       // Remover información sensible en acceso público
-      delete mockTrackingData.shipment_id
+      mockTrackingData.shipment_id = undefined as any
       mockTrackingData.events.forEach(event => {
         if (event.description.includes('electrónicos')) {
           event.description = 'Paquete en proceso'

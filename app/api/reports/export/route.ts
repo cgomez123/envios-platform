@@ -95,7 +95,8 @@ ${reportData.analytics.top_carriers.map(c =>
 ).join('\n')}
 
 ## DETALLE DE ENVÍOS
-${csvHeaders}${reportData.shipments.map(s => 
+ID,Fecha,Destinatario,Paquetería,Estado,Costo,Peso,Ruta
+${reportData.shipments.map(s => 
 `${s.id},${s.date},${s.recipient},${s.carrier},${s.status},${s.cost},${s.weight},${s.route}`
 ).join('\n')}
         `
