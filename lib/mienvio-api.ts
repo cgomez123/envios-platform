@@ -262,18 +262,18 @@ export class MienvioAPI {
       },
     ];
 
-    // Si es nacional, agregar opciones económicas
+    // Si es nacional, agregar opciones económicas REALES
     if (!isInternational) {
       quotes.push({
-        carrier: 'Correos de México',
-        service: 'Mexpost',
-        price: Math.round(45 + (baseWeight * 5)),
+        carrier: 'Estafeta',
+        service: 'Estafeta Día Siguiente',
+        price: Math.round(65 + (baseWeight * 8)),
         currency: 'MXN',
-        delivery_time: '5-8 días hábiles',
-        carrier_code: 'CORREOS',
-        service_code: 'STANDARD',
+        delivery_time: '1-2 días hábiles',
+        carrier_code: 'ESTAFETA',
+        service_code: 'EXPRESS',
         tracking_included: true,
-        insurance_included: false,
+        insurance_included: true,
       });
     }
 

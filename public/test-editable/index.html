@@ -215,15 +215,21 @@
                     <div class="campo">
                         <label>🏠 DESDE (Código Postal Origen) *</label>
                         <input type="text" id="origen" class="azul" value="06100" placeholder="Ej: 06100"
-                               onclick="this.select()" onkeyup="console.log('Origen:', this.value)" required>
-                        <small style="color: #6b7280; font-size: 14px;">Ciudad de México: 06100, Monterrey: 64000</small>
+                               onclick="this.select()" onkeyup="autocompletarDireccion('origen', this.value)" required>
+                        <div id="direccion-origen" style="color: #10b981; font-size: 14px; margin-top: 5px; font-weight: bold;">
+                            Centro, Ciudad de México, CDMX
+                        </div>
+                        <small style="color: #6b7280; font-size: 12px;">Ejemplos: 06100, 64000, 44100, 22000</small>
                     </div>
                     
                     <div class="campo">
                         <label>🎯 HASTA (Código Postal Destino) *</label>
                         <input type="text" id="destino" class="azul" value="44100" placeholder="Ej: 44100"
-                               onclick="this.select()" onkeyup="console.log('Destino:', this.value)" required>
-                        <small style="color: #6b7280; font-size: 14px;">Guadalajara: 44100, Tijuana: 22000</small>
+                               onclick="this.select()" onkeyup="autocompletarDireccion('destino', this.value)" required>
+                        <div id="direccion-destino" style="color: #10b981; font-size: 14px; margin-top: 5px; font-weight: bold;">
+                            Centro, Guadalajara, Jalisco
+                        </div>
+                        <small style="color: #6b7280; font-size: 12px;">Ejemplos: 06100, 64000, 44100, 22000</small>
                     </div>
                 </div>
                 
@@ -277,6 +283,67 @@
     </div>
 
     <script>
+        // 🇲🇽 BASE DE DATOS DE CÓDIGOS POSTALES MEXICANOS
+        const codigosPostales = {
+            '06100': { estado: 'Ciudad de México', ciudad: 'Ciudad de México', colonia: 'Centro' },
+            '44100': { estado: 'Jalisco', ciudad: 'Guadalajara', colonia: 'Centro' },
+            '64000': { estado: 'Nuevo León', ciudad: 'Monterrey', colonia: 'Centro' },
+            '22000': { estado: 'Baja California', ciudad: 'Tijuana', colonia: 'Centro' },
+            '80000': { estado: 'Sinaloa', ciudad: 'Culiacán', colonia: 'Centro' },
+            '72000': { estado: 'Puebla', ciudad: 'Puebla', colonia: 'Centro' },
+            '01000': { estado: 'Ciudad de México', ciudad: 'Ciudad de México', colonia: 'San Ángel' },
+            '03100': { estado: 'Ciudad de México', ciudad: 'Ciudad de México', colonia: 'Coyoacán' },
+            '66200': { estado: 'Nuevo León', ciudad: 'San Pedro Garza García', colonia: 'Centro' },
+            '45100': { estado: 'Jalisco', ciudad: 'Zapopan', colonia: 'Centro' },
+            '32000': { estado: 'Chihuahua', ciudad: 'Ciudad Juárez', colonia: 'Centro' },
+            '20000': { estado: 'Aguascalientes', ciudad: 'Aguascalientes', colonia: 'Centro' }
+        };
+
+        // 🔍 Función de autocompletado de dirección
+        async function autocompletarDireccion(tipo, codigoPostal) {
+            const elementoDir = document.getElementById(`direccion-${tipo}`);
+            
+            if (codigoPostal.length === 5) {
+                console.log(`🔍 Buscando dirección para CP: ${codigoPostal}`);
+                
+                // Buscar en base local primero
+                if (codigosPostales[codigoPostal]) {
+                    const datos = codigosPostales[codigoPostal];
+                    const direccionCompleta = `${datos.colonia}, ${datos.ciudad}, ${datos.estado}`;
+                    elementoDir.innerHTML = `📍 ${direccionCompleta}`;
+                    elementoDir.style.color = '#10b981';
+                    return;
+                }
+                
+                // API SEPOMEX como fallback
+                try {
+                    elementoDir.innerHTML = '🔍 Buscando...';
+                    elementoDir.style.color = '#6b7280';
+                    
+                    const response = await fetch(`https://api.copomex.com/query/info/${codigoPostal}?token=pruebas`);
+                    const data = await response.json();
+                    
+                    if (data && data.length > 0 && !data.error) {
+                        const lugar = data[0];
+                        const direccionCompleta = `${lugar.asentamiento || lugar.response.asentamiento}, ${lugar.ciudad || lugar.response.ciudad}, ${lugar.estado || lugar.response.estado}`;
+                        elementoDir.innerHTML = `📍 ${direccionCompleta}`;
+                        elementoDir.style.color = '#10b981';
+                    } else {
+                        throw new Error('No encontrado');
+                    }
+                } catch (error) {
+                    console.log('❌ Error en API SEPOMEX:', error);
+                    elementoDir.innerHTML = `❌ CP ${codigoPostal} no encontrado`;
+                    elementoDir.style.color = '#ef4444';
+                }
+            } else if (codigoPostal.length > 0) {
+                elementoDir.innerHTML = '✏️ Escribe 5 dígitos...';
+                elementoDir.style.color = '#6b7280';
+            } else {
+                elementoDir.innerHTML = '';
+            }
+        }
+
         // Forzar editabilidad al cargar
         window.onload = function() {
             const inputs = document.querySelectorAll('input');
