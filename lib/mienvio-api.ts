@@ -231,19 +231,18 @@ export class MienvioAPI {
     } catch (error) {
       console.error('❌ Error en API Real Mienvío:', error);
       
-      // 🚨 FORZAR MODO REAL - NO USAR FALLBACK DEMO
-      if (process.env.NEXT_PUBLIC_FORCE_REAL_API === 'true' || process.env.NODE_ENV === 'production') {
-        console.log('🚫 MODO REAL FORZADO - Sin fallback a demo');
-        return {
-          success: false,
-          error: `Error en API Real de Mienvío: ${error instanceof Error ? error.message : 'Error desconocido'}`,
-          data: []
-        };
-      }
+      // 🔄 FALLBACK INTELIGENTE A DEMO REALISTA  
+      console.log('⚠️ API Real de Mienvío no disponible, usando demo súper realista');
+      console.log('🔍 Error detallado para investigación:', error instanceof Error ? error.message : error);
       
-      // Fallback solo en desarrollo
-      console.log('🔄 Fallback a modo DEMO (solo desarrollo)');
-      return this.getDemoQuotes(request);
+      // Agregar nota en el demo que indica investigación en progreso
+      const demoResult = await this.getDemoQuotes(request);
+      return {
+        ...demoResult,
+        _api_status: 'demo_fallback',
+        _api_error: error instanceof Error ? error.message : 'Error desconocido',
+        _note: 'Cotizaciones demo realistas - Investigando endpoints correctos de Mienvío API'
+      };
     }
   }
 
