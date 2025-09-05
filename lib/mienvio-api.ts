@@ -44,10 +44,20 @@ export class MienvioAPI {
   private password = process.env.MIENVIO_PASSWORD;
 
   private isRealCredentials(): boolean {
-    return !!(this.apiKey && 
+    console.log('🔍 Verificando credenciales:', {
+      hasApiKey: !!this.apiKey,
+      apiKeyLength: this.apiKey?.length || 0,
+      apiKeyStart: this.apiKey?.substring(0, 10) || 'NO_KEY',
+      baseUrl: this.baseUrl
+    });
+    
+    const isReal = !!(this.apiKey && 
               this.apiKey !== 'demo-key' && 
               this.apiKey !== 'REEMPLAZA_CON_TU_API_KEY' &&
               this.apiKey.length > 10);
+              
+    console.log('🎯 Resultado credenciales reales:', isReal);
+    return isReal;
   }
 
   private getHeaders(): Record<string, string> {
@@ -191,8 +201,18 @@ export class MienvioAPI {
     } catch (error) {
       console.error('❌ Error en API Real Mienvío:', error);
       
-      // En caso de error en API real, usar demo como fallback
-      console.log('🔄 Fallback a modo DEMO por error en API real');
+      // 🚨 FORZAR MODO REAL - NO USAR FALLBACK DEMO
+      if (process.env.NEXT_PUBLIC_FORCE_REAL_API === 'true' || process.env.NODE_ENV === 'production') {
+        console.log('🚫 MODO REAL FORZADO - Sin fallback a demo');
+        return {
+          success: false,
+          error: `Error en API Real de Mienvío: ${error instanceof Error ? error.message : 'Error desconocido'}`,
+          data: []
+        };
+      }
+      
+      // Fallback solo en desarrollo
+      console.log('🔄 Fallback a modo DEMO (solo desarrollo)');
       return this.getDemoQuotes(request);
     }
   }
