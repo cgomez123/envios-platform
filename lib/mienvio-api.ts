@@ -160,6 +160,7 @@ export class MienvioAPI {
       // 🔄 FALLBACK INTELIGENTE A DEMO REALISTA  
       console.log('⚠️ API Real de Mienvío no disponible, usando demo súper realista');
       console.log('🔍 Error detallado para investigación:', error instanceof Error ? error.message : error);
+      console.log('🚨 USUARIO: Comparte estos logs para arreglar la API real');
       
       // Agregar nota en el demo que indica investigación en progreso
       const demoResult = await this.getDemoQuotes(request);

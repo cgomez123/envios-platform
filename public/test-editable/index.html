@@ -409,10 +409,11 @@
             resultados.style.display = 'none';
             
             try {
-                const response = await fetch('/api/test-mienvio-real', {
+                const response = await fetch('/api/shipping/quote', {
                     method: 'POST',
                     headers: { 
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-Real-API': 'true'
                     },
                     body: JSON.stringify(datos)
                 });
@@ -420,10 +421,10 @@
                 const result = await response.json();
                 console.log('📥 Respuesta de API:', result);
                 
-                if (result.success && result.api_response && result.api_response.success && result.api_response.data && result.api_response.data.length > 0) {
-                    mostrarResultados(result.api_response.data);
+                if (result.success && result.data && result.data.length > 0) {
+                    mostrarResultados(result.data);
                 } else {
-                    throw new Error(result.error || result.api_response?.error || 'No se encontraron cotizaciones');
+                    throw new Error(result.error || 'No se encontraron cotizaciones');
                 }
                 
             } catch (error) {
