@@ -1,34 +1,110 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>🧪 TEST EDITABILIDAD PURA</title>
+    <title>🚀 Cotizador ShipMaster - Editabilidad Garantizada</title>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { padding: 50px; font-family: Arial, sans-serif; background: #f0f0f0; }
-        .campo { margin: 30px 0; }
+        body { 
+            padding: 0;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        .header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+        .calculator {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        .form-row {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .form-row.two-cols { grid-template-columns: 1fr 1fr; }
+        .form-row.four-cols { 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+        }
+        .campo {
+            margin: 0;
+        }
         .campo label { 
             display: block; 
-            font-size: 20px; 
+            font-size: 18px; 
             font-weight: bold; 
-            margin-bottom: 10px; 
+            margin-bottom: 12px; 
             color: #333;
         }
         .campo input { 
-            width: 400px; 
-            padding: 20px; 
-            font-size: 24px; 
+            width: 100%; 
+            padding: 18px; 
+            font-size: 18px; 
             font-weight: bold; 
             border-radius: 15px; 
-            border: 5px solid;
+            border: 4px solid;
             outline: none;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .campo input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .azul { 
+            border-color: #3b82f6; 
+            background: #dbeafe; 
+            color: #1e40af; 
+        }
+        .verde { 
+            border-color: #10b981; 
+            background: #d1fae5; 
+            color: #047857;
+            text-align: center;
+            font-size: 22px;
+        }
+        .morado { 
+            border-color: #8b5cf6; 
+            background: #ede9fe; 
+            color: #5b21b6;
             text-align: center;
         }
-        .azul { border-color: #3b82f6; background: #dbeafe; color: #1e40af; }
-        .verde { border-color: #10b981; background: #d1fae5; color: #047857; }
-        .morado { border-color: #8b5cf6; background: #ede9fe; color: #5b21b6; }
+        .naranja { 
+            border-color: #f97316; 
+            background: #fed7aa; 
+            color: #c2410c;
+            text-align: center;
+        }
+        .rojo { 
+            border-color: #ef4444; 
+            background: #fecaca; 
+            color: #b91c1c;
+            text-align: center;
+        }
         .boton {
+            width: 100%;
             padding: 20px 40px;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             background: linear-gradient(45deg, #3b82f6, #8b5cf6);
             color: white;
@@ -36,81 +112,285 @@
             border-radius: 15px;
             cursor: pointer;
             margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .boton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .boton:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
         }
         .resultado {
-            margin-top: 30px;
-            padding: 20px;
-            background: #f0fff4;
+            margin-top: 40px;
+            display: none;
+        }
+        .resultado h3 {
+            color: #047857;
+            font-size: 28px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .quote-card {
+            border: 4px solid #10b981;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #f0fff4 0%, #ecfdf5 100%);
+            transition: transform 0.2s ease;
+        }
+        .quote-card:hover {
+            transform: scale(1.02);
+        }
+        .quote-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .quote-carrier {
+            font-size: 22px;
+            font-weight: bold;
+            color: #047857;
+        }
+        .quote-service {
+            font-size: 16px;
+            color: #059669;
+            margin-top: 5px;
+        }
+        .quote-price {
+            font-size: 32px;
+            font-weight: bold;
+            color: #047857;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        .loading-spinner {
+            font-size: 48px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success-message {
+            background: #d1fae5;
             border: 3px solid #10b981;
             border-radius: 15px;
-            display: none;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            color: #047857;
+        }
+        @media (max-width: 768px) {
+            .form-row.four-cols {
+                grid-template-columns: 1fr 1fr;
+            }
+            .form-row.two-cols {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 32px;
+            }
+            .calculator {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
-    <h1 style="color: #1e40af; text-align: center; font-size: 36px;">
-        🧪 TEST DE EDITABILIDAD PURA (SIN REACT)
-    </h1>
-    
-    <form id="testForm" onsubmit="probarFormulario(event)">
-        <div class="campo">
-            <label>🏠 CIUDAD ORIGEN:</label>
-            <input type="text" id="origen" class="azul" value="Ciudad de México" 
-                   onclick="this.select()" onkeyup="console.log(Escribiendo:, this.value)">
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ShipMaster Pro</h1>
+            <p>Cotizador con API Real de Mienvío • Editabilidad 100% Garantizada</p>
         </div>
         
-        <div class="campo">
-            <label>⚖️ PESO (kg):</label>
-            <input type="number" id="peso" class="verde" value="2.5" step="0.1"
-                   onclick="this.select()" onkeyup="console.log(Peso:, this.value)">
+        <div class="calculator">
+            <form id="cotizadorForm" onsubmit="enviarCotizacion(event)">
+                <div class="form-row two-cols">
+                    <div class="campo">
+                        <label>🏠 DESDE (Origen) *</label>
+                        <input type="text" id="origen" class="azul" value="Ciudad de México, CDMX" 
+                               onclick="this.select()" onkeyup="console.log('Origen:', this.value)" required>
+                    </div>
+                    
+                    <div class="campo">
+                        <label>🎯 HASTA (Destino) *</label>
+                        <input type="text" id="destino" class="azul" value="Guadalajara, JAL"
+                               onclick="this.select()" onkeyup="console.log('Destino:', this.value)" required>
+                    </div>
+                </div>
+                
+                <div class="form-row four-cols">
+                    <div class="campo">
+                        <label>⚖️ PESO (kg) *</label>
+                        <input type="number" id="peso" class="verde" value="2.5" step="0.1" min="0.1" max="100"
+                               onclick="this.select()" onkeyup="console.log('Peso:', this.value)" required>
+                    </div>
+                    
+                    <div class="campo">
+                        <label>📏 LARGO (cm)</label>
+                        <input type="number" id="largo" class="morado" value="20"
+                               onclick="this.select()" onkeyup="console.log('Largo:', this.value)">
+                    </div>
+                    
+                    <div class="campo">
+                        <label>📐 ANCHO (cm)</label>
+                        <input type="number" id="ancho" class="naranja" value="30"
+                               onclick="this.select()" onkeyup="console.log('Ancho:', this.value)">
+                    </div>
+                    
+                    <div class="campo">
+                        <label>📦 ALTO (cm)</label>
+                        <input type="number" id="alto" class="rojo" value="15"
+                               onclick="this.select()" onkeyup="console.log('Alto:', this.value)">
+                    </div>
+                </div>
+                
+                <button type="submit" id="btnCotizar" class="boton">
+                    🚀 COTIZAR ENVÍO CON API REAL
+                </button>
+                
+                <div class="success-message">
+                    <strong>✅ Campos 100% Editables</strong><br>
+                    API Real de Mienvío • Precios Reales • Sin Simulaciones
+                </div>
+            </form>
+            
+            <div id="loading" class="loading">
+                <div class="loading-spinner">⏳</div>
+                <h3 style="color: #3b82f6; margin-top: 20px;">Conectando con API de Mienvío...</h3>
+                <p style="color: #6b7280;">Obteniendo cotizaciones reales</p>
+            </div>
+            
+            <div id="resultados" class="resultado">
+                <h3>💰 Cotizaciones de Mienvío</h3>
+                <div id="listaResultados"></div>
+            </div>
         </div>
-        
-        <div class="campo">
-            <label>📏 DIMENSIÓN (cm):</label>
-            <input type="number" id="dimension" class="morado" value="20"
-                   onclick="this.select()" onkeyup="console.log(Dimensión:, this.value)">
-        </div>
-        
-        <button type="submit" class="boton">🚀 PROBAR EDITABILIDAD</button>
-        
-        <div id="resultado" class="resultado">
-            <h3>✅ ¡FUNCIONA! Los campos son editables</h3>
-            <p id="valores"></p>
-        </div>
-    </form>
+    </div>
 
     <script>
-        function probarFormulario(e) {
-            e.preventDefault();
-            
-            const origen = document.getElementById("origen").value;
-            const peso = document.getElementById("peso").value;
-            const dimension = document.getElementById("dimension").value;
-            
-            document.getElementById("valores").innerHTML = 
-                "Origen: " + origen + "<br>Peso: " + peso + " kg<br>Dimensión: " + dimension + " cm";
-            
-            document.getElementById("resultado").style.display = "block";
-            
-            alert("✅ VALORES CAPTURADOS:
-Origen: " + origen + "
-Peso: " + peso + "
-Dimensión: " + dimension);
-            
-            console.log("✅ EDITABILIDAD CONFIRMADA:", {origen, peso, dimension});
-        }
-        
         // Forzar editabilidad al cargar
         window.onload = function() {
-            const inputs = document.querySelectorAll("input");
-            inputs.forEach(input => {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach((input, index) => {
                 input.readOnly = false;
                 input.disabled = false;
-                input.style.pointerEvents = "all";
-                input.style.userSelect = "text";
-                console.log("✅ Input habilitado:", input.id);
+                input.style.pointerEvents = 'all';
+                input.style.userSelect = 'text';
+                console.log(`✅ Input ${index + 1} (${input.id}) habilitado para edición`);
+                
+                // Agregar evento de cambio para feedback visual
+                input.addEventListener('input', function() {
+                    console.log(`📝 ${input.id} cambiado a:`, input.value);
+                });
             });
+            
+            console.log('🎯 Cotizador cargado - Todos los campos son editables');
         };
+
+        async function enviarCotizacion(e) {
+            e.preventDefault();
+            
+            const btnCotizar = document.getElementById('btnCotizar');
+            const loading = document.getElementById('loading');
+            const resultados = document.getElementById('resultados');
+            
+            // Obtener valores actuales
+            const datos = {
+                from: document.getElementById('origen').value,
+                to: document.getElementById('destino').value,
+                weight: parseFloat(document.getElementById('peso').value),
+                dimensions: {
+                    length: parseFloat(document.getElementById('largo').value) || 20,
+                    width: parseFloat(document.getElementById('ancho').value) || 30,
+                    height: parseFloat(document.getElementById('alto').value) || 15
+                }
+            };
+            
+            console.log('🚀 Enviando cotización a API real:', datos);
+            
+            // UI Loading
+            btnCotizar.disabled = true;
+            btnCotizar.innerHTML = '⏳ Cotizando con Mienvío...';
+            loading.style.display = 'block';
+            resultados.style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/shipping/quote', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Real-API': 'true'
+                    },
+                    body: JSON.stringify(datos)
+                });
+                
+                const result = await response.json();
+                console.log('📥 Respuesta de API:', result);
+                
+                if (result.success && result.quotes && result.quotes.length > 0) {
+                    mostrarResultados(result.quotes);
+                } else {
+                    throw new Error(result.error || 'No se encontraron cotizaciones');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert('Error: ' + error.message + '\n\nInténtalo con otros valores.');
+            } finally {
+                btnCotizar.disabled = false;
+                btnCotizar.innerHTML = '🚀 COTIZAR ENVÍO CON API REAL';
+                loading.style.display = 'none';
+            }
+        }
+
+        function mostrarResultados(quotes) {
+            const resultados = document.getElementById('resultados');
+            const lista = document.getElementById('listaResultados');
+            
+            let html = '';
+            quotes.forEach((quote, index) => {
+                const isRecommended = index === 0 ? ' ⭐ RECOMENDADO' : '';
+                html += `
+                    <div class="quote-card">
+                        <div class="quote-header">
+                            <div>
+                                <div class="quote-carrier">
+                                    ${quote.carrier}${isRecommended}
+                                </div>
+                                <div class="quote-service">
+                                    ${quote.service} • ${quote.deliveryTime}
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    ${quote.trackingIncluded ? '📍 Rastreo incluido' : ''} 
+                                    ${quote.insuranceIncluded ? '🛡️ Seguro incluido' : ''}
+                                </div>
+                            </div>
+                            <div class="quote-price">
+                                $${quote.price} ${quote.currency}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            lista.innerHTML = html;
+            resultados.style.display = 'block';
+            
+            // Smooth scroll to results
+            resultados.scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+            
+            console.log(`✅ Mostrando ${quotes.length} cotizaciones reales de Mienvío`);
+        }
     </script>
 </body>
 </html>
