@@ -213,15 +213,17 @@
             <form id="cotizadorForm" onsubmit="enviarCotizacion(event)">
                 <div class="form-row two-cols">
                     <div class="campo">
-                        <label>🏠 DESDE (Origen) *</label>
-                        <input type="text" id="origen" class="azul" value="Ciudad de México, CDMX" 
+                        <label>🏠 DESDE (Código Postal Origen) *</label>
+                        <input type="text" id="origen" class="azul" value="06100" placeholder="Ej: 06100"
                                onclick="this.select()" onkeyup="console.log('Origen:', this.value)" required>
+                        <small style="color: #6b7280; font-size: 14px;">Ciudad de México: 06100, Monterrey: 64000</small>
                     </div>
                     
                     <div class="campo">
-                        <label>🎯 HASTA (Destino) *</label>
-                        <input type="text" id="destino" class="azul" value="Guadalajara, JAL"
+                        <label>🎯 HASTA (Código Postal Destino) *</label>
+                        <input type="text" id="destino" class="azul" value="44100" placeholder="Ej: 44100"
                                onclick="this.select()" onkeyup="console.log('Destino:', this.value)" required>
+                        <small style="color: #6b7280; font-size: 14px;">Guadalajara: 44100, Tijuana: 22000</small>
                     </div>
                 </div>
                 
@@ -301,16 +303,30 @@
             const loading = document.getElementById('loading');
             const resultados = document.getElementById('resultados');
             
-            // Obtener valores actuales
+            // Obtener valores actuales con formato correcto para Mienvío
+            const origenCP = document.getElementById('origen').value;
+            const destinoCP = document.getElementById('destino').value;
+            
             const datos = {
-                from: document.getElementById('origen').value,
-                to: document.getElementById('destino').value,
-                weight: parseFloat(document.getElementById('peso').value),
-                dimensions: {
+                from_address: {
+                    zipcode: origenCP,
+                    city: "Ciudad",
+                    state: "Estado", 
+                    country: "MX"
+                },
+                to_address: {
+                    zipcode: destinoCP,
+                    city: "Ciudad",
+                    state: "Estado",
+                    country: "MX"
+                },
+                parcel: {
+                    weight: parseFloat(document.getElementById('peso').value),
                     length: parseFloat(document.getElementById('largo').value) || 20,
                     width: parseFloat(document.getElementById('ancho').value) || 30,
                     height: parseFloat(document.getElementById('alto').value) || 15
-                }
+                },
+                packing_mode: 'package'
             };
             
             console.log('🚀 Enviando cotización a API real:', datos);
@@ -322,11 +338,10 @@
             resultados.style.display = 'none';
             
             try {
-                const response = await fetch('/api/shipping/quote', {
+                const response = await fetch('/api/test-mienvio-real', {
                     method: 'POST',
                     headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Real-API': 'true'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(datos)
                 });
@@ -334,10 +349,10 @@
                 const result = await response.json();
                 console.log('📥 Respuesta de API:', result);
                 
-                if (result.success && result.quotes && result.quotes.length > 0) {
-                    mostrarResultados(result.quotes);
+                if (result.success && result.api_response && result.api_response.success && result.api_response.data && result.api_response.data.length > 0) {
+                    mostrarResultados(result.api_response.data);
                 } else {
-                    throw new Error(result.error || 'No se encontraron cotizaciones');
+                    throw new Error(result.error || result.api_response?.error || 'No se encontraron cotizaciones');
                 }
                 
             } catch (error) {
