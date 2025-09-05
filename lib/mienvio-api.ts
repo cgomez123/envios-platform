@@ -1,27 +1,29 @@
-// Integración con API de Mienvío
-interface MienvioQuoteRequest {
+// 🚚 API de Mienvío para cotizaciones de envío
+// Documentación: https://api.mienvio.mx/v2.0/reference/getshipmentrates
+
+export interface MienvioQuoteRequest {
   from_address: {
     zipcode: string;
-    city: string;
-    state: string;
-    country: string;
+    city?: string;
+    state?: string;
+    country?: string;
   };
   to_address: {
     zipcode: string;
-    city: string;
-    state: string;
-    country: string;
+    city?: string;
+    state?: string;
+    country?: string;
   };
   parcel: {
-    weight: number; // en kg
-    length: number; // en cm
-    width: number;  // en cm
-    height: number; // en cm
+    weight: number;
+    length: number;
+    width: number;
+    height: number;
   };
-  packing_mode: string;
+  packing_mode?: string;
 }
 
-interface MienvioQuoteResponse {
+export interface MienvioQuoteResponse {
   success: boolean;
   data: Array<{
     carrier: string;
@@ -35,6 +37,9 @@ interface MienvioQuoteResponse {
     insurance_included: boolean;
   }>;
   error?: string;
+  _api_status?: string;
+  _api_error?: string; 
+  _note?: string;
 }
 
 export class MienvioAPI {
@@ -67,7 +72,6 @@ export class MienvioAPI {
     };
 
     if (this.isRealCredentials()) {
-      // Mienvío API V2 usa API Key en Authorization header
       if (this.apiKey) {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
@@ -78,150 +82,72 @@ export class MienvioAPI {
 
   async getQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {
     try {
-      // Si no tenemos credenciales reales, usar modo demo
       if (!this.isRealCredentials()) {
         console.log('🧪 Usando modo DEMO - No hay credenciales reales configuradas')
         return this.getDemoQuotes(request);
       }
 
-      console.log('🔑 Usando API REAL de Mienvío - Método directo de cotización');
+      console.log('🔑 Usando API REAL de Mienvío - Endpoint oficial /shipments/rates');
 
-      // MÉTODO DIRECTO: Cotización sin crear direcciones por separado
-      const quoteData = {
-        origin: {
-          name: "Origen",
-          street: "Calle Principal 123",
-          city: request.from_address.city || "Ciudad",
-          state: request.from_address.state || "Estado", 
-          zipcode: request.from_address.zipcode,
-          country: request.from_address.country || 'MX',
-          email: "origen@test.com",
-          phone: "5551234567"
-        },
-        destination: {
-          name: "Destino", 
-          street: "Calle Destino 456",
-          city: request.to_address.city || "Ciudad",
-          state: request.to_address.state || "Estado",
-          zipcode: request.to_address.zipcode,
-          country: request.to_address.country || 'MX', 
-          email: "destino@test.com",
-          phone: "5551234568"
-        },
-        packages: [{
-          weight: request.parcel.weight || 1,
-          height: request.parcel.height || 10,
-          length: request.parcel.length || 20,
-          width: request.parcel.width || 15
-        }],
-        declared_value: 100,
-        content_description: "Paquete de prueba"
+      // FORMATO OFICIAL PARA /shipments/rates según documentación de Mienvío
+      const shipmentData = {
+        shipment: {
+          origin: {
+            postal_code: request.from_address.zipcode,
+            country: request.from_address.country || "MX"
+          },
+          destination: {
+            postal_code: request.to_address.zipcode,
+            country: request.to_address.country || "MX"
+          },
+          packages: [{
+            weight: {
+              value: request.parcel.weight || 1,
+              unit: "kg"
+            },
+            dimensions: {
+              length: request.parcel.length || 20,
+              width: request.parcel.width || 15,
+              height: request.parcel.height || 10,
+              unit: "cm"
+            }
+          }],
+          // Campos adicionales requeridos según API
+          content_description: "Mercancía general",
+          declared_value: {
+            amount: 100,
+            currency: "MXN"
+          },
+          insurance: false
+        }
       };
 
-      console.log('📤 Enviando cotización directa:', quoteData);
+      console.log('📤 Enviando datos al endpoint oficial:', shipmentData);
 
-      // Probar múltiples endpoints hasta encontrar el correcto
-      const endpoints = [
-        '/rates',           // Endpoint común para cotizaciones
-        '/shipments/rates', // Endpoint alternativo 
-        '/quotes',          // Ya probado, pero incluido
-        '/shipments/quote', // Variación posible
-        '/calculate'        // Otro posible endpoint
-      ];
-
-      let quoteResponse: Response | null = null;
-      let lastError = '';
-
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`🔍 Probando endpoint: ${this.baseUrl}${endpoint}`);
-          
-          quoteResponse = await fetch(`${this.baseUrl}${endpoint}`, {
-            method: 'POST',
-            headers: this.getHeaders(),
-            body: JSON.stringify(quoteData),
-          });
-
-          console.log(`📡 Respuesta ${endpoint}:`, {
-            status: quoteResponse.status,
-            statusText: quoteResponse.statusText
-          });
-
-          if (quoteResponse.ok) {
-            console.log(`✅ Endpoint exitoso encontrado: ${endpoint}`);
-            break;
-          } else {
-            const errorText = await quoteResponse.text();
-            lastError = `${endpoint}: ${quoteResponse.status} - ${errorText}`;
-            console.log(`❌ Falló ${endpoint}:`, lastError);
-            continue;
-          }
-        } catch (err) {
-          lastError = `${endpoint}: ${err}`;
-          console.log(`❌ Error en ${endpoint}:`, err);
-          continue;
-        }
-      }
-
-      // Verificación adicional para TypeScript
-      if (!quoteResponse || !quoteResponse.ok) {
-        throw new Error('Error: No se pudo conectar con la API de Mienvío');
-      }
-
-      console.log('📡 Respuesta exitosa del servidor:', {
-        status: quoteResponse.status,
-        statusText: quoteResponse.statusText,
-        url: quoteResponse.url
+      // LLAMADA AL ENDPOINT OFICIAL: /shipments/rates
+      const response = await fetch(`${this.baseUrl}/shipments/rates`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(shipmentData),
       });
 
-      const ratesData = await quoteResponse.json();
-      console.log('📥 Cotizaciones directas de Mienvío:', ratesData);
+      console.log('📡 Respuesta de /shipments/rates:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
 
-      // Transformar respuesta de Mienvío API V2 al formato estándar
-      let transformedData: any[] = [];
-
-      if (ratesData.quotes && Array.isArray(ratesData.quotes)) {
-        // Formato: { quotes: [...] }
-        transformedData = ratesData.quotes.map((rate: any) => ({
-          carrier: rate.carrier || rate.carrier_name || rate.service_provider,
-          service: rate.service || rate.service_name || rate.service_type,
-          price: rate.rate || rate.price || rate.total_price || rate.cost,
-          currency: rate.currency || 'MXN',
-          delivery_time: rate.estimated_delivery || rate.delivery_time || rate.estimated_days || '2-3 días',
-          carrier_code: rate.carrier_code || rate.carrier,
-          service_code: rate.service_code || rate.service,
-          tracking_included: rate.tracking_included !== false,
-          insurance_included: rate.insurance_included || false,
-        }));
-      } else if (ratesData.data && Array.isArray(ratesData.data)) {
-        // Formato: { data: [...] }
-        transformedData = ratesData.data.map((rate: any) => ({
-          carrier: rate.carrier || rate.carrier_name || rate.service_provider,
-          service: rate.service || rate.service_name || rate.service_type,
-          price: rate.rate || rate.price || rate.total_price || rate.cost,
-          currency: rate.currency || 'MXN',
-          delivery_time: rate.estimated_delivery || rate.delivery_time || rate.estimated_days || '2-3 días',
-          carrier_code: rate.carrier_code || rate.carrier,
-          service_code: rate.service_code || rate.service,
-          tracking_included: rate.tracking_included !== false,
-          insurance_included: rate.insurance_included || false,
-        }));
-      } else if (Array.isArray(ratesData)) {
-        // Formato: [...]
-        transformedData = ratesData.map((rate: any) => ({
-          carrier: rate.carrier || rate.carrier_name || rate.service_provider,
-          service: rate.service || rate.service_name || rate.service_type,
-          price: rate.rate || rate.price || rate.total_price || rate.cost,
-          currency: rate.currency || 'MXN',
-          delivery_time: rate.estimated_delivery || rate.delivery_time || rate.estimated_days || '2-3 días',
-          carrier_code: rate.carrier_code || rate.carrier,
-          service_code: rate.service_code || rate.service,
-          tracking_included: rate.tracking_included !== false,
-          insurance_included: rate.insurance_included || false,
-        }));
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Error detallado:', errorText);
+        throw new Error(`Error ${response.status}: ${errorText}`);
       }
 
-      console.log('✅ Datos transformados:', transformedData);
+      const ratesData = await response.json();
+      console.log('📥 Cotizaciones recibidas de Mienvío:', ratesData);
+
+      // Transformar respuesta de Mienvío al formato estándar
+      const transformedData = this.transformMienvioRates(ratesData);
 
       return {
         success: true,
@@ -241,59 +167,79 @@ export class MienvioAPI {
         ...demoResult,
         _api_status: 'demo_fallback',
         _api_error: error instanceof Error ? error.message : 'Error desconocido',
-        _note: 'Cotizaciones demo realistas - Investigando endpoints correctos de Mienvío API'
+        _note: 'Cotizaciones demo realistas - Usando endpoint oficial /shipments/rates'
       };
     }
+  }
+
+  private transformMienvioRates(ratesData: any): any[] {
+    let transformedData: any[] = [];
+
+    // Diferentes formatos posibles de respuesta de Mienvío
+    if (ratesData.rates && Array.isArray(ratesData.rates)) {
+      transformedData = ratesData.rates.map((rate: any) => this.transformSingleRate(rate));
+    } else if (ratesData.data && Array.isArray(ratesData.data)) {
+      transformedData = ratesData.data.map((rate: any) => this.transformSingleRate(rate));
+    } else if (Array.isArray(ratesData)) {
+      transformedData = ratesData.map((rate: any) => this.transformSingleRate(rate));
+    }
+
+    console.log('✅ Datos transformados:', transformedData);
+    return transformedData;
+  }
+
+  private transformSingleRate(rate: any) {
+    return {
+      carrier: rate.carrier || rate.carrier_name || rate.service_provider || 'Carrier',
+      service: rate.service || rate.service_name || rate.service_type || 'Service',
+      price: rate.rate || rate.price || rate.total_price || rate.cost || rate.amount || 0,
+      currency: rate.currency || 'MXN',
+      delivery_time: rate.estimated_delivery || rate.delivery_time || rate.estimated_days || rate.transit_time || '2-3 días',
+      carrier_code: rate.carrier_code || rate.carrier || 'CODE',
+      service_code: rate.service_code || rate.service || 'SERVICE',
+      tracking_included: rate.tracking_included !== false,
+      insurance_included: rate.insurance_included || false,
+    };
   }
 
   async getDemoQuotes(request: MienvioQuoteRequest): Promise<MienvioQuoteResponse> {
     // Simulación SÚPER realista basada en peso, distancia y ubicación
     const baseWeight = request.parcel.weight || 1;
-    const isInternational = request.to_address.country !== 'MX';
+    const fromZip = request.from_address.zipcode;
+    const toZip = request.to_address.zipcode;
     
-    // Calcular distancia aproximada entre ciudades para precios más realistas
-    const fromCity = request.from_address.city.toLowerCase();
-    const toCity = request.to_address.city.toLowerCase();
-    
-    let distanceMultiplier = 1;
-    if (fromCity.includes('méxico') && toCity.includes('guadalajara')) distanceMultiplier = 1.2;
-    else if (fromCity.includes('méxico') && toCity.includes('monterrey')) distanceMultiplier = 1.4;
-    else if (fromCity.includes('méxico') && toCity.includes('cancún')) distanceMultiplier = 1.8;
-    else if (Math.abs(fromCity.length - toCity.length) > 3) distanceMultiplier = 1.3;
-    
-    // Simular delay realista de API
-    await new Promise(resolve => setTimeout(resolve, 1200 + Math.random() * 800));
+    // Cálculo de distancia aproximada entre códigos postales
+    const distance = this.calculateDistance(fromZip, toZip);
+    const isInternational = request.from_address.country !== request.to_address.country;
+    const distanceMultiplier = distance > 1000 ? 1.5 : distance > 500 ? 1.3 : 1.0;
+
+    console.log('🧪 Generando cotizaciones demo realistas:', {
+      peso: baseWeight,
+      distancia: distance,
+      origen: fromZip,
+      destino: toZip,
+      internacional: isInternational
+    });
 
     const quotes = [
       {
         carrier: 'FedEx',
-        service: 'FedEx Express',
-        price: Math.round((120 + (baseWeight * 15)) * distanceMultiplier * (isInternational ? 2.5 : 1)),
+        service: 'FedEx Ground',
+        price: Math.round((85 + (baseWeight * 12)) * distanceMultiplier * (isInternational ? 2.1 : 1)),
         currency: 'MXN',
-        delivery_time: isInternational ? '3-5 días hábiles' : '1-2 días hábiles',
+        delivery_time: isInternational ? '5-7 días hábiles' : '2-4 días hábiles',
         carrier_code: 'FEDEX',
-        service_code: 'EXPRESS',
+        service_code: 'GROUND',
         tracking_included: true,
-        insurance_included: true,
+        insurance_included: false,
       },
       {
         carrier: 'DHL',
         service: 'DHL Express',
-        price: Math.round((95 + (baseWeight * 12)) * distanceMultiplier * (isInternational ? 2.2 : 1)),
+        price: Math.round((120 + (baseWeight * 15)) * distanceMultiplier * (isInternational ? 2.5 : 1)),
         currency: 'MXN',
-        delivery_time: isInternational ? '4-6 días hábiles' : '2-3 días hábiles',
+        delivery_time: isInternational ? '3-5 días hábiles' : '1-2 días hábiles',
         carrier_code: 'DHL',
-        service_code: 'EXPRESS',
-        tracking_included: true,
-        insurance_included: true,
-      },
-      {
-        carrier: 'Estafeta',
-        service: 'Estafeta Express',
-        price: Math.round((75 + (baseWeight * 8)) * distanceMultiplier * (isInternational ? 1.8 : 1)),
-        currency: 'MXN',
-        delivery_time: isInternational ? '5-7 días hábiles' : '2-4 días hábiles',
-        carrier_code: 'ESTAFETA',
         service_code: 'EXPRESS',
         tracking_included: true,
         insurance_included: false,
@@ -330,6 +276,12 @@ export class MienvioAPI {
       success: true,
       data: quotes.sort((a, b) => a.price - b.price) // Ordenar por precio
     };
+  }
+
+  private calculateDistance(fromZip: string, toZip: string): number {
+    // Simulación básica de distancia basada en códigos postales
+    const zipDistance = Math.abs(parseInt(fromZip) - parseInt(toZip));
+    return Math.min(zipDistance, 2000); // Max 2000km
   }
 
   async trackShipment(trackingNumber: string, carrier: string) {
