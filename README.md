@@ -279,5 +279,4 @@ MIT License - Ve el archivo [LICENSE](LICENSE) para más detalles.
     <a href="/pricing">💰 Pricing</a> • 
     <a href="mailto:hola@shipmaster.mx">📧 Contacto</a>
   </p>
-</div># FORCE VERCEL DEPLOY - Thu Sep  4 17:27:24 CST 2025
-# FORCE VERCEL DEPLOY - jueves,  4 de septiembre de 2025, 17:30:13 CST
+</div>
