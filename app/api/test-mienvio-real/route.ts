@@ -3,32 +3,35 @@ import { mienvioAPI } from '@/lib/mienvio-api';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🧪 INICIANDO TEST DE API REAL DE MIENVÍO');
+    console.log('🧪 INICIANDO API REAL DE MIENVÍO CON DATOS DEL USUARIO');
 
-    // Request de prueba seguro - Ciudad de México a Guadalajara
+    // Obtener datos reales del usuario
+    const body = await request.json();
+    console.log('📥 Datos recibidos del usuario:', body);
+
     const testRequest = {
       from_address: {
-        zipcode: "06100",
-        city: "Ciudad de México",
-        state: "CDMX",
-        country: "MX"
+        zipcode: body.from_address?.zipcode || "06100",
+        city: body.from_address?.city || "Ciudad",
+        state: body.from_address?.state || "Estado",
+        country: body.from_address?.country || "MX"
       },
       to_address: {
-        zipcode: "44100",
-        city: "Guadalajara",
-        state: "Jalisco", 
-        country: "MX"
+        zipcode: body.to_address?.zipcode || "44100", 
+        city: body.to_address?.city || "Ciudad",
+        state: body.to_address?.state || "Estado",
+        country: body.to_address?.country || "MX"
       },
       parcel: {
-        weight: 1, // 1 kg
-        length: 20, // 20 cm
-        width: 15, // 15 cm
-        height: 10 // 10 cm
+        weight: body.parcel?.weight || 1,
+        length: body.parcel?.length || 20,
+        width: body.parcel?.width || 15,
+        height: body.parcel?.height || 10
       },
-      packing_mode: "package"
+      packing_mode: body.packing_mode || "package"
     };
 
-    console.log('📤 Enviando request de prueba:', testRequest);
+    console.log('📤 Request con datos del usuario:', testRequest);
 
     const result = await mienvioAPI.getQuotes(testRequest);
 
