@@ -120,12 +120,48 @@ export class MienvioAPI {
 
       console.log('📤 Enviando cotización directa:', quoteData);
 
-      // Intentar endpoint directo de cotización
-      const quoteResponse = await fetch(`${this.baseUrl}/quotes`, {
-        method: 'POST',
-        headers: this.getHeaders(),
-        body: JSON.stringify(quoteData),
-      });
+      // Probar múltiples endpoints hasta encontrar el correcto
+      const endpoints = [
+        '/rates',           // Endpoint común para cotizaciones
+        '/shipments/rates', // Endpoint alternativo 
+        '/quotes',          // Ya probado, pero incluido
+        '/shipments/quote', // Variación posible
+        '/calculate'        // Otro posible endpoint
+      ];
+
+      let quoteResponse;
+      let lastError = '';
+
+      for (const endpoint of endpoints) {
+        try {
+          console.log(`🔍 Probando endpoint: ${this.baseUrl}${endpoint}`);
+          
+          quoteResponse = await fetch(`${this.baseUrl}${endpoint}`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify(quoteData),
+          });
+
+          console.log(`📡 Respuesta ${endpoint}:`, {
+            status: quoteResponse.status,
+            statusText: quoteResponse.statusText
+          });
+
+          if (quoteResponse.ok) {
+            console.log(`✅ Endpoint exitoso encontrado: ${endpoint}`);
+            break;
+          } else {
+            const errorText = await quoteResponse.text();
+            lastError = `${endpoint}: ${quoteResponse.status} - ${errorText}`;
+            console.log(`❌ Falló ${endpoint}:`, lastError);
+            continue;
+          }
+        } catch (err) {
+          lastError = `${endpoint}: ${err}`;
+          console.log(`❌ Error en ${endpoint}:`, err);
+          continue;
+        }
+      }
 
       console.log('📡 Respuesta del servidor:', {
         status: quoteResponse.status,
