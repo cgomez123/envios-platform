@@ -129,7 +129,7 @@ export class MienvioAPI {
         '/calculate'        // Otro posible endpoint
       ];
 
-      let quoteResponse;
+      let quoteResponse: Response | null = null;
       let lastError = '';
 
       for (const endpoint of endpoints) {
@@ -163,23 +163,22 @@ export class MienvioAPI {
         }
       }
 
-      console.log('📡 Respuesta del servidor:', {
+      // Verificación adicional para TypeScript
+      if (!quoteResponse || !quoteResponse.ok) {
+        throw new Error('Error: No se pudo conectar con la API de Mienvío');
+      }
+
+      console.log('📡 Respuesta exitosa del servidor:', {
         status: quoteResponse.status,
         statusText: quoteResponse.statusText,
         url: quoteResponse.url
       });
 
-      if (!quoteResponse.ok) {
-        const errorText = await quoteResponse.text();
-        console.error('❌ Error completo:', errorText);
-        throw new Error(`Error en cotización: ${quoteResponse.status} - ${errorText}`);
-      }
-
       const ratesData = await quoteResponse.json();
       console.log('📥 Cotizaciones directas de Mienvío:', ratesData);
 
       // Transformar respuesta de Mienvío API V2 al formato estándar
-      let transformedData = [];
+      let transformedData: any[] = [];
 
       if (ratesData.quotes && Array.isArray(ratesData.quotes)) {
         // Formato: { quotes: [...] }
