@@ -1,6 +1,6 @@
 import { Hero } from '@/components/Hero'
 import { Features } from '@/components/Features'
-import { SimpleCalculator } from '@/components/SimpleCalculator'
+import { HTMLCalculator } from '@/components/HTMLCalculator'
 import TrackingSearch from '@/components/TrackingSearch'
 import { Stats } from '@/components/Stats'
 import { Testimonials } from '@/components/Testimonials'
@@ -22,7 +22,7 @@ export default function Home() {
               <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
                 💰 Cotizar Envío
               </h2>
-              <SimpleCalculator />
+              <HTMLCalculator />
             </div>
             
             <div>
