@@ -4,26 +4,44 @@ import { mienvioAPI } from '@/lib/mienvio-api'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { from, to, weight, dimensions } = body
+    console.log('📥 Datos recibidos:', body)
+    
+    // Soportar múltiples formatos de entrada
+    const fromAddress = body.from_address || body.from
+    const toAddress = body.to_address || body.to  
+    const parcelWeight = body.parcel?.weight || body.weight
+    const dimensions = body.parcel || body.dimensions
 
     // Validar datos requeridos
-    if (!from || !to || !weight) {
+    if (!fromAddress || !toAddress || !parcelWeight) {
+      console.log('❌ Validación falló:', {
+        fromAddress: !!fromAddress,
+        toAddress: !!toAddress, 
+        parcelWeight: !!parcelWeight
+      })
       return NextResponse.json(
         { error: 'Faltan datos requeridos: origen, destino y peso' },
         { status: 400 }
       )
     }
 
+    console.log('✅ Validación exitosa:', {
+      from: fromAddress,
+      to: toAddress,
+      weight: parcelWeight
+    })
+
     // Verificar si se solicita API real (por defecto usar real)
     const useRealAPI = request.headers.get('X-Real-API') === 'true' || !request.headers.get('X-Demo-Mode')
 
     // Parsear direcciones usando el formato correcto de Mienvío
     const parseAddress = (addressInput: any) => {
-      // Si viene del ShippingCalculator, ya tiene el formato correcto
+      // Si viene del test-editable (formato correcto)
       if (typeof addressInput === 'object' && addressInput.zipcode) {
+        console.log('📍 Dirección parseada:', addressInput)
         return {
-          city: addressInput.city,
-          state: addressInput.state,
+          city: addressInput.city || "Ciudad",
+          state: addressInput.state || "Estado",
           zipcode: addressInput.zipcode,
           country: addressInput.country || 'MX'
         }
@@ -33,7 +51,7 @@ export async function POST(request: NextRequest) {
       const parts = String(addressInput).split(',').map(p => p.trim())
       return {
         city: parts[0] || String(addressInput),
-        state: parts[1] || 'CDMX',
+        state: parts[1] || 'CDMX', 
         zipcode: '01000', // Por ahora usamos un CP genérico
         country: 'MX'
       }
@@ -41,10 +59,10 @@ export async function POST(request: NextRequest) {
 
     // Preparar request para Mienvío con formato correcto
     const mienvioRequest = {
-      from_address: parseAddress(from),
-      to_address: parseAddress(to),
+      from_address: parseAddress(fromAddress),
+      to_address: parseAddress(toAddress),
       parcel: {
-        weight: parseFloat(weight) || 1,
+        weight: parseFloat(parcelWeight) || 1,
         length: parseFloat(dimensions?.length) || 20,
         width: parseFloat(dimensions?.width) || 15,
         height: parseFloat(dimensions?.height) || 10,
